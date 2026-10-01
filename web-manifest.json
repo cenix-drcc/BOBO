@@ -1,0 +1,49 @@
+{
+  "index.pck": {
+    "size": 139941844,
+    "parts": [
+      "index.pck.part00",
+      "index.pck.part01",
+      "index.pck.part02",
+      "index.pck.part03",
+      "index.pck.part04",
+      "index.pck.part05",
+      "index.pck.part06",
+      "index.pck.part07",
+      "index.pck.part08",
+      "index.pck.part09",
+      "index.pck.part10",
+      "index.pck.part11",
+      "index.pck.part12",
+      "index.pck.part13",
+      "index.pck.part14",
+      "index.pck.part15",
+      "index.pck.part16",
+      "index.pck.part17",
+      "index.pck.part18",
+      "index.pck.part19",
+      "index.pck.part20",
+      "index.pck.part21",
+      "index.pck.part22",
+      "index.pck.part23",
+      "index.pck.part24",
+      "index.pck.part25",
+      "index.pck.part26"
+    ],
+    "sha256": "52d1b82a1852e54408ff115b82af5644d6df28b2f83ae959ff83983f6ba52c0b"
+  },
+  "index.wasm": {
+    "size": 39514754,
+    "parts": [
+      "index.wasm.part00",
+      "index.wasm.part01",
+      "index.wasm.part02",
+      "index.wasm.part03",
+      "index.wasm.part04",
+      "index.wasm.part05",
+      "index.wasm.part06",
+      "index.wasm.part07"
+    ],
+    "sha256": "fc74679e3b97f76878947fcd4fbe1268cbfa6188182a2e33bbc3f5dc9bfa57d0"
+  }
+}
