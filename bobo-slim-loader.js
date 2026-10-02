@@ -121,7 +121,12 @@
       const [wasm,pck]=await Promise.all([decoded(m.engine,'application/wasm',title),decoded(m.core,'application/octet-stream',title)]);
       return {'index.wasm':wasm,'index.pck':pck};
     }, '打开绘本失败').catch(error=>{startupPromise=null;throw error;});
-    return (await startupPromise)[name].clone();
+    const responses=await startupPromise;
+    const response=responses[name];
+    delete responses[name]; // Do not keep an unread tee branch holding a full decompressed WASM/PCK.
+    if(response) return response;
+    const m=await manifest();
+    return decoded(name==='index.wasm'?m.engine:m.core,name==='index.wasm'?'application/wasm':'application/octet-stream','正在打开绘本…');
   };
   window.BOBOWeb = {
     metrics,
