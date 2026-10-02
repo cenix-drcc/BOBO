@@ -4,6 +4,18 @@
 
 随源码和游戏分发保留本文件。素材许可不适用于BOBO代码/插画；不暗示作者或机构为项目背书。
 
+## 完整介绍的人声朗读（20种动物，2026-10-02）
+
+`art/audio/narration/*_full_v1.ogg` 为BOBO完整介绍的合成普通话人声，不是动物叫声，也不是真人录音。
+模型：hexgrad / Kokoro-82M-v1.1-zh，Apache-2.0。
+https://huggingface.co/hexgrad/Kokoro-82M-v1.1-zh
+推理：k2-fsa / sherpa-onnx 1.13.8，Apache-2.0；离线使用 zf_001（sid 3），speed 0.94。
+https://github.com/k2-fsa/sherpa-onnx
+原模型、完整许可、原始PCM、文案SHA256及处理记录保留在源码 `audio_sources/narration_tts_v1/`，不将模型或生成工具打入游戏。
+处理：24kHz单声道，BS.1770两遍平均响度归一化目标-18LUFS、真峰值余量-2dB，OGG Vorbis；玩家音量-3dB。
+完整介绍来自用户迁移内容表的解说词整理，科普修订依据见 `data/animal_narration.json`；不是只读画面短句。
+随运行版附 Apache-2.0 完整文本 `NARRATION_LICENSE.txt`。该模型许可不代表其他用户提供的动物叫声已获授权。
+
 ## 狮子
 
 Lion loud.mp3 — Bidone. Freesound 69570, 2009-03-23.

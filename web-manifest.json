@@ -1,6 +1,6 @@
 {
   "index.pck": {
-    "size": 139941844,
+    "size": 142562600,
     "parts": [
       "index.pck.part00",
       "index.pck.part01",
@@ -28,9 +28,10 @@
       "index.pck.part23",
       "index.pck.part24",
       "index.pck.part25",
-      "index.pck.part26"
+      "index.pck.part26",
+      "index.pck.part27"
     ],
-    "sha256": "52d1b82a1852e54408ff115b82af5644d6df28b2f83ae959ff83983f6ba52c0b"
+    "sha256": "832557a088d6be62f4aa23ec102485da9c226229ba6d9cfc5bc8b37ba90c7f50"
   },
   "index.wasm": {
     "size": 39514754,
