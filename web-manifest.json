@@ -1,50 +1,198 @@
 {
-  "index.pck": {
-    "size": 142562600,
-    "parts": [
-      "index.pck.part00",
-      "index.pck.part01",
-      "index.pck.part02",
-      "index.pck.part03",
-      "index.pck.part04",
-      "index.pck.part05",
-      "index.pck.part06",
-      "index.pck.part07",
-      "index.pck.part08",
-      "index.pck.part09",
-      "index.pck.part10",
-      "index.pck.part11",
-      "index.pck.part12",
-      "index.pck.part13",
-      "index.pck.part14",
-      "index.pck.part15",
-      "index.pck.part16",
-      "index.pck.part17",
-      "index.pck.part18",
-      "index.pck.part19",
-      "index.pck.part20",
-      "index.pck.part21",
-      "index.pck.part22",
-      "index.pck.part23",
-      "index.pck.part24",
-      "index.pck.part25",
-      "index.pck.part26",
-      "index.pck.part27"
-    ],
-    "sha256": "832557a088d6be62f4aa23ec102485da9c226229ba6d9cfc5bc8b37ba90c7f50"
+  "version": "slim-v2-20261002",
+  "engine": {
+    "file": "engine-a1a6d45d7036.wasm.gz",
+    "bytes": 10054758,
+    "rawBytes": 39514754,
+    "sha256": "a1a6d45d70363dcf625dfe3cc3e860358292574d5394411f9747d3aafb30030f"
   },
-  "index.wasm": {
-    "size": 39514754,
-    "parts": [
-      "index.wasm.part00",
-      "index.wasm.part01",
-      "index.wasm.part02",
-      "index.wasm.part03",
-      "index.wasm.part04",
-      "index.wasm.part05",
-      "index.wasm.part06",
-      "index.wasm.part07"
-    ],
-    "sha256": "fc74679e3b97f76878947fcd4fbe1268cbfa6188182a2e33bbc3f5dc9bfa57d0"
-  }
+  "core": {
+    "file": "core-d3b567d88ae6.pck.gz",
+    "bytes": 1058156,
+    "rawBytes": 1106600,
+    "sha256": "d3b567d88ae6d5a0f1b3bf707b8f35dbe7ed408a178663761f0196b52fead8fa"
+  },
+  "animals": {
+    "非洲象": {
+      "file": "african_elephant-c241f1a4ddd8.pck.gz",
+      "bytes": 1373352,
+      "rawBytes": 1388396,
+      "sha256": "c241f1a4ddd89993966cac95363498e86df744e3a058bc34032936e0f0840c3b",
+      "id": "african_elephant"
+    },
+    "长颈鹿": {
+      "file": "giraffe-3c7855bad01f.pck.gz",
+      "bytes": 1016291,
+      "rawBytes": 1028872,
+      "sha256": "3c7855bad01f2f0fce86cd03e4baaa2df911955be0ff9a574179c7a722b97380",
+      "id": "giraffe"
+    },
+    "狮子": {
+      "file": "lion-e94495e2abd7.pck.gz",
+      "bytes": 2199630,
+      "rawBytes": 2220112,
+      "sha256": "e94495e2abd73ed5884b42f90895f2d3853df1617711d58c8afd0897324f070b",
+      "id": "lion"
+    },
+    "平原斑马": {
+      "file": "plains_zebra-c96e8ca24869.pck.gz",
+      "bytes": 1657436,
+      "rawBytes": 1676296,
+      "sha256": "c96e8ca248699b6d6f0f918b5b86e6440a397b19633f7e94b77f8873101b8979",
+      "id": "plains_zebra"
+    },
+    "大熊猫": {
+      "file": "giant_panda-3e15ed199bc5.pck.gz",
+      "bytes": 932434,
+      "rawBytes": 961328,
+      "sha256": "3e15ed199bc5cb6fa4a0890fad2bb6770833fdaf0626b531badb727358bff497",
+      "id": "giant_panda"
+    },
+    "棕熊": {
+      "file": "brown_bear-46d080d68ac6.pck.gz",
+      "bytes": 1004434,
+      "rawBytes": 1020968,
+      "sha256": "46d080d68ac65f25fffa60ad1f67f0a7dc3c01b02d4e120a4f82990cc54bd539",
+      "id": "brown_bear"
+    },
+    "红狐狸": {
+      "file": "red_fox-c3a514291b41.pck.gz",
+      "bytes": 945760,
+      "rawBytes": 959808,
+      "sha256": "c3a514291b41d3ae5214689cc7f95c5c0b9fd02d8fe5eb4a6d03b20fd8b1822f",
+      "id": "red_fox"
+    },
+    "梅花鹿": {
+      "file": "sika_deer-4ab0ec9bd006.pck.gz",
+      "bytes": 945830,
+      "rawBytes": 958316,
+      "sha256": "4ab0ec9bd006702a3fa56e3f2523ab357bf60430b28d26f7ff04dba2838cb814",
+      "id": "sika_deer"
+    },
+    "北极熊": {
+      "file": "polar_bear-a0a767acec7f.pck.gz",
+      "bytes": 1092774,
+      "rawBytes": 1111152,
+      "sha256": "a0a767acec7f4b3cbfd379b1ceacbbebe9a6035fb7f69d9a00484f42c715d897",
+      "id": "polar_bear"
+    },
+    "帝企鹅": {
+      "file": "emperor_penguin-5f65d49fdad0.pck.gz",
+      "bytes": 516185,
+      "rawBytes": 531432,
+      "sha256": "5f65d49fdad0471bc28972d8ddb58410bbdb559148f6ad03954bede888e638be",
+      "id": "emperor_penguin"
+    },
+    "竖琴海豹": {
+      "file": "harp_seal-401f8b675f4c.pck.gz",
+      "bytes": 960836,
+      "rawBytes": 980292,
+      "sha256": "401f8b675f4cebf76f8295a6db25c32ed3d8dacf0ee9b303d6c803205675ad83",
+      "id": "harp_seal"
+    },
+    "宽吻海豚": {
+      "file": "bottlenose_dolphin-84e1c63ffc05.pck.gz",
+      "bytes": 508728,
+      "rawBytes": 520932,
+      "sha256": "84e1c63ffc0579a114a156d8df97359a8d6dbbecd6c72beab7fd019bf099d8bd",
+      "id": "bottlenose_dolphin"
+    },
+    "绿海龟": {
+      "file": "green_sea_turtle-25189ef2de15.pck.gz",
+      "bytes": 664508,
+      "rawBytes": 679028,
+      "sha256": "25189ef2de15ceb02ab640d3b4ef7c73b2a034a3abe43bb120d2a9d384218303",
+      "id": "green_sea_turtle"
+    },
+    "普通章鱼": {
+      "file": "common_octopus-c432450c03e0.pck.gz",
+      "bytes": 658152,
+      "rawBytes": 670140,
+      "sha256": "c432450c03e0510e2b174d55bd1f9f91265240407c3694e4bf61a69d60f28fe7",
+      "id": "common_octopus"
+    },
+    "孟加拉虎": {
+      "file": "bengal_tiger-07291bc462dd.pck.gz",
+      "bytes": 958501,
+      "rawBytes": 980288,
+      "sha256": "07291bc462ddc85148c46910d6cf7f8f52397ee8f59d706bacad94633be4736d",
+      "id": "bengal_tiger"
+    },
+    "东部大猩猩": {
+      "file": "eastern_gorilla-fa7975c76e8b.pck.gz",
+      "bytes": 871218,
+      "rawBytes": 888380,
+      "sha256": "fa7975c76e8b51560d8024f97af4d324ad354e15230dbaab8dfb9c8aea0adf6d",
+      "id": "eastern_gorilla"
+    },
+    "褐喉三趾树懒": {
+      "file": "brown_throated_sloth-71e1fa03e538.pck.gz",
+      "bytes": 799576,
+      "rawBytes": 814220,
+      "sha256": "71e1fa03e53837c74dfd109dded312abbe8bbd0cfbfdab80048cf4cacff4ce41",
+      "id": "brown_throated_sloth"
+    },
+    "白头海雕": {
+      "file": "bald_eagle-44d5be47ad2f.pck.gz",
+      "bytes": 860154,
+      "rawBytes": 873492,
+      "sha256": "44d5be47ad2f5ee0f3eeae6ba05639981714da040318f895a88c30456e46f9e4",
+      "id": "bald_eagle"
+    },
+    "大红鹳（火烈鸟）": {
+      "file": "greater_flamingo-6f751baa341f.pck.gz",
+      "bytes": 604606,
+      "rawBytes": 623876,
+      "sha256": "6f751baa341fd88928a712e0dad072c6abc7033978a3441ae5ef7b9bcc639a89",
+      "id": "greater_flamingo"
+    },
+    "红眼树蛙": {
+      "file": "red_eyed_tree_frog-eac20d2d44f0.pck.gz",
+      "bytes": 721215,
+      "rawBytes": 735748,
+      "sha256": "eac20d2d44f06798139760055f2f3e1e96fe44a67fe8c6e2f677e358faa78287",
+      "id": "red_eyed_tree_frog"
+    }
+  },
+  "files": [
+    ".nojekyll",
+    "CREDITS_AUDIO.md",
+    "LICENSE-fflate.txt",
+    "NARRATION_LICENSE.txt",
+    "OFL-NotoSansSC.txt",
+    "README.md",
+    "african_elephant-c241f1a4ddd8.pck.gz",
+    "bald_eagle-44d5be47ad2f.pck.gz",
+    "bengal_tiger-07291bc462dd.pck.gz",
+    "bobo-gzip-worker.js",
+    "bobo-slim-loader.js",
+    "bottlenose_dolphin-84e1c63ffc05.pck.gz",
+    "brown_bear-46d080d68ac6.pck.gz",
+    "brown_throated_sloth-71e1fa03e538.pck.gz",
+    "common_octopus-c432450c03e0.pck.gz",
+    "core-d3b567d88ae6.pck.gz",
+    "eastern_gorilla-fa7975c76e8b.pck.gz",
+    "emperor_penguin-5f65d49fdad0.pck.gz",
+    "engine-a1a6d45d7036.wasm.gz",
+    "fflate-0.8.3.js",
+    "giant_panda-3e15ed199bc5.pck.gz",
+    "giraffe-3c7855bad01f.pck.gz",
+    "greater_flamingo-6f751baa341f.pck.gz",
+    "green_sea_turtle-25189ef2de15.pck.gz",
+    "harp_seal-401f8b675f4c.pck.gz",
+    "index.apple-touch-icon.png",
+    "index.audio.position.worklet.js",
+    "index.audio.worklet.js",
+    "index.html",
+    "index.icon.png",
+    "index.js",
+    "index.png",
+    "lion-e94495e2abd7.pck.gz",
+    "plains_zebra-c96e8ca24869.pck.gz",
+    "polar_bear-a0a767acec7f.pck.gz",
+    "red_eyed_tree_frog-eac20d2d44f0.pck.gz",
+    "red_fox-c3a514291b41.pck.gz",
+    "sika_deer-4ab0ec9bd006.pck.gz",
+    "web-manifest.json"
+  ]
 }
