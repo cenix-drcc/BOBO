@@ -1,0 +1,26 @@
+#bobo-course-overlay[hidden],#bobo-course-overlay [hidden]{display:none!important}
+#bobo-course-overlay{position:fixed;inset:0;z-index:1100;display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:24px;background:rgba(22,29,26,.72);font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:#43554b;text-align:center;overflow:auto;touch-action:manipulation}
+#bobo-course-overlay *{box-sizing:border-box}
+.bobo-download-paper{width:min(510px,100%);padding:32px 38px 26px;border:1px solid #d8ceba;border-radius:16px 13px 18px 12px;background-color:#f7f2e6;background-image:radial-gradient(#98836915 .6px,transparent .9px),radial-gradient(#fff9eb70 1px,transparent 2px);background-size:7px 11px,13px 17px;box-shadow:0 10px 34px #0b171936,inset 0 0 24px #d3c5a91c}
+.bobo-download-kicker{font-size:13px;color:#8b806b;letter-spacing:1px}
+#bobo-course-overlay h2{font-weight:500;font-size:29px;line-height:1.3;margin:15px 0}
+.bobo-download-message{font-size:17px;line-height:1.6;min-height:28px;margin:0}
+.bobo-progress-scene{position:relative;padding-top:104px;margin:6px 0 15px}
+.bobo-mini-elephant{position:absolute;width:104px;height:104px;bottom:6px;left:0;background-size:300% 200%;background-repeat:no-repeat;transition:left .14s linear;image-rendering:auto}
+.bobo-course-track{height:16px;border:1px solid #b4bba1;border-radius:12px;background:#e3e6d6;overflow:hidden;box-shadow:inset 0 1px 3px #63776418}
+.bobo-course-fill{height:100%;width:0;background:linear-gradient(0deg,#7a9471,#9eb18c);border-radius:10px;transition:width .14s linear}
+.bobo-progress-numbers{display:flex;justify-content:space-between;align-items:baseline;font-size:15px;color:#65765e}
+.bobo-progress-numbers strong{font-size:24px;font-weight:500}
+.bobo-download-detail{font-size:12px;line-height:1.7;color:#958b76;margin:17px 0 20px}
+#bobo-course-overlay button{font:inherit;cursor:pointer;min-height:44px;padding:10px 29px;border-radius:9px;border:1px solid #b7b39c;color:#47594d;background:#f8f3e7}
+#bobo-course-overlay button:hover{background:#e8ecdf}
+#bobo-course-overlay button:focus-visible{outline:3px solid #90ac84;outline-offset:4px}
+.bobo-download-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.bobo-download-success{width:min(510px,100%);color:#fcf8ed;padding:15px 10px}
+.bobo-family{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}
+#bobo-course-overlay .bobo-download-success h2{font-size:34px;margin:20px 0 8px;letter-spacing:3px}
+.bobo-download-success p{font-size:21px;margin:0 0 28px;letter-spacing:2px}
+#bobo-course-overlay .bobo-ack{min-width:185px;background:#ffffff32;border-color:#ffffff66;color:#fffdf4;border-radius:24px}
+#bobo-course-overlay .bobo-ack:hover{background:#ffffff48}
+@media(max-width:480px){#bobo-course-overlay{padding:18px}.bobo-download-paper{padding:25px 24px}.bobo-download-kicker{font-size:11px}#bobo-course-overlay h2{font-size:25px}.bobo-download-message{font-size:15px}.bobo-download-success p{font-size:18px}}
+@media(max-height:480px){.bobo-download-paper{padding:14px 28px}#bobo-course-overlay h2{margin:8px 0}.bobo-progress-scene{padding-top:78px}.bobo-mini-elephant{height:80px;width:80px}.bobo-download-detail{margin:8px 0}.bobo-family{max-height:180px;width:auto;max-width:100%}.bobo-download-success p{margin-bottom:15px}}

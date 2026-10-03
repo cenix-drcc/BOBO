@@ -1,5 +1,5 @@
 {
-  "version": "slim-v2-20261002",
+  "version": "download-v3-20261003",
   "engine": {
     "file": "engine-a1a6d45d7036.wasm.gz",
     "bytes": 10054758,
@@ -7,10 +7,10 @@
     "sha256": "a1a6d45d70363dcf625dfe3cc3e860358292574d5394411f9747d3aafb30030f"
   },
   "core": {
-    "file": "core-d3b567d88ae6.pck.gz",
-    "bytes": 1058156,
-    "rawBytes": 1106600,
-    "sha256": "d3b567d88ae6d5a0f1b3bf707b8f35dbe7ed408a178663761f0196b52fead8fa"
+    "file": "core-9bab6f475464.pck.gz",
+    "bytes": 1065942,
+    "rawBytes": 1114976,
+    "sha256": "9bab6f475464a426335145c2c62011b8f52b691298b197d25e1091117129fccb"
   },
   "animals": {
     "非洲象": {
@@ -170,7 +170,7 @@
     "brown_bear-46d080d68ac6.pck.gz",
     "brown_throated_sloth-71e1fa03e538.pck.gz",
     "common_octopus-c432450c03e0.pck.gz",
-    "core-d3b567d88ae6.pck.gz",
+    "core-9bab6f475464.pck.gz",
     "eastern_gorilla-fa7975c76e8b.pck.gz",
     "emperor_penguin-5f65d49fdad0.pck.gz",
     "engine-a1a6d45d7036.wasm.gz",
@@ -193,6 +193,10 @@
     "red_eyed_tree_frog-eac20d2d44f0.pck.gz",
     "red_fox-c3a514291b41.pck.gz",
     "sika_deer-4ab0ec9bd006.pck.gz",
-    "web-manifest.json"
+    "web-manifest.json",
+    "bobo-download-ui.js",
+    "bobo-download-ui.css",
+    "download-elephant-v1.webp",
+    "download-family-v1.webp"
   ]
 }
