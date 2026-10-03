@@ -3,7 +3,7 @@
   'use strict';
   const nativeFetch = window.fetch.bind(window);
   const base = new URL('.', document.currentScript.src);
-  const version = 'download-v3-20261003';
+  const version = 'narration-fix-v4-20261003';
   const cacheName = 'bobo-web-resources-v2';
   let manifestPromise;
   let startupPromise;

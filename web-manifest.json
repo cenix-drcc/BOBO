@@ -1,5 +1,5 @@
 {
-  "version": "download-v3-20261003",
+  "version": "narration-fix-v4-20261003",
   "engine": {
     "file": "engine-a1a6d45d7036.wasm.gz",
     "bytes": 10054758,
@@ -7,10 +7,10 @@
     "sha256": "a1a6d45d70363dcf625dfe3cc3e860358292574d5394411f9747d3aafb30030f"
   },
   "core": {
-    "file": "core-9bab6f475464.pck.gz",
-    "bytes": 1065942,
-    "rawBytes": 1114976,
-    "sha256": "9bab6f475464a426335145c2c62011b8f52b691298b197d25e1091117129fccb"
+    "file": "core-4dcdf284d024.pck.gz",
+    "bytes": 1066667,
+    "rawBytes": 1115648,
+    "sha256": "4dcdf284d024e04bcc6347eba1b90d1ae451e391b97da5b452f942b4fcfc47a3"
   },
   "animals": {
     "非洲象": {
@@ -170,7 +170,7 @@
     "brown_bear-46d080d68ac6.pck.gz",
     "brown_throated_sloth-71e1fa03e538.pck.gz",
     "common_octopus-c432450c03e0.pck.gz",
-    "core-9bab6f475464.pck.gz",
+    "core-4dcdf284d024.pck.gz",
     "eastern_gorilla-fa7975c76e8b.pck.gz",
     "emperor_penguin-5f65d49fdad0.pck.gz",
     "engine-a1a6d45d7036.wasm.gz",
