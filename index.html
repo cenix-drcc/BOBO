@@ -109,12 +109,29 @@ body {
 			<div id="status-notice"></div>
 		</div>
 
-		<link rel="stylesheet" href="bobo-download-ui.css?v=bgm-live-v5-20261003">
-<script src="bobo-download-ui.js?v=bgm-live-v5-20261003"></script>
-<script src="bobo-slim-loader.js?v=bgm-live-v5-20261003"></script>
-<script src="index.js?v=bgm-live-v5-20261003"></script>
+		<link rel="stylesheet" href="bobo-download-ui.css?v=mini4-compat-v7-20261003">
+<script src="bobo-download-ui.js?v=mini4-compat-v7-20261003"></script>
+<script src="bobo-slim-loader.js?v=mini4-compat-v7-20261003"></script>
+
 		<script>
+(async function () {
+const selectedEngine = await window.BOBOWeb.prepareEngine();
 const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":2438556,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+GODOT_CONFIG.fileSizes['index.wasm'] = selectedEngine.rawBytes;
+if (window.BOBOWeb.metrics.engineVariant === 'compat-no-simd') {
+    // Keep book layout/CSS dimensions; do not render a 2x Retina framebuffer
+    // on old 2GB tablets. This reduces framebuffer pixels by 75%, not textures
+    // or content quality in the original/native project.
+    GODOT_CONFIG.canvasResizePolicy = 0;
+    const compatCanvas = document.getElementById('canvas');
+    const resizeCompatCanvas = () => {
+        compatCanvas.width = Math.max(1, Math.round(window.innerWidth));
+        compatCanvas.height = Math.max(1, Math.round(window.innerHeight));
+        compatCanvas.style.width = '100%'; compatCanvas.style.height = '100%';
+    };
+    resizeCompatCanvas(); window.addEventListener('resize', resizeCompatCanvas);
+    window.BOBOWeb.metrics.renderPixelRatio = 1;
+}
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 window.BOBOWeb.attach(engine);
@@ -154,6 +171,7 @@ window.BOBOWeb.attach(engine);
 	}
 
 	function displayFailureNotice(err) {
+		window.BOBOWeb.fail(err);
 		console.error(err);
 		if (err instanceof Error) {
 			setStatusNotice(err.message);
@@ -218,6 +236,7 @@ window.BOBOWeb.attach(engine);
 		}, displayFailureNotice);
 	}
 }());
+}()).catch(error => window.BOBOWeb.fail(error));
 		</script>
 	</body>
 </html>

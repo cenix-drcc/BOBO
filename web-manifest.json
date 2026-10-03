@@ -1,5 +1,5 @@
 {
-  "version": "bgm-live-v5-20261003",
+  "version": "mini4-compat-v7-20261003",
   "engine": {
     "file": "engine-a1a6d45d7036.wasm.gz",
     "bytes": 10054758,
@@ -157,6 +157,8 @@
   "files": [
     ".nojekyll",
     "CREDITS_AUDIO.md",
+    "GODOT-COPYRIGHT.txt",
+    "GODOT-LICENSE.txt",
     "LICENSE-fflate.txt",
     "NARRATION_LICENSE.txt",
     "OFL-NotoSansSC.txt",
@@ -164,6 +166,8 @@
     "african_elephant-c241f1a4ddd8.pck.gz",
     "bald_eagle-44d5be47ad2f.pck.gz",
     "bengal_tiger-07291bc462dd.pck.gz",
+    "bobo-download-ui.css",
+    "bobo-download-ui.js",
     "bobo-gzip-worker.js",
     "bobo-slim-loader.js",
     "bottlenose_dolphin-84e1c63ffc05.pck.gz",
@@ -171,9 +175,12 @@
     "brown_throated_sloth-71e1fa03e538.pck.gz",
     "common_octopus-c432450c03e0.pck.gz",
     "core-daa93be7f62e.pck.gz",
+    "download-elephant-v1.webp",
+    "download-family-v1.webp",
     "eastern_gorilla-fa7975c76e8b.pck.gz",
     "emperor_penguin-5f65d49fdad0.pck.gz",
     "engine-a1a6d45d7036.wasm.gz",
+    "engine-compat-e42688c58cc6.wasm.gz",
     "fflate-0.8.3.js",
     "giant_panda-3e15ed199bc5.pck.gz",
     "giraffe-3c7855bad01f.pck.gz",
@@ -183,6 +190,7 @@
     "index.apple-touch-icon.png",
     "index.audio.position.worklet.js",
     "index.audio.worklet.js",
+    "index.compat.js",
     "index.html",
     "index.icon.png",
     "index.js",
@@ -193,10 +201,15 @@
     "red_eyed_tree_frog-eac20d2d44f0.pck.gz",
     "red_fox-c3a514291b41.pck.gz",
     "sika_deer-4ab0ec9bd006.pck.gz",
-    "web-manifest.json",
-    "bobo-download-ui.js",
-    "bobo-download-ui.css",
-    "download-elephant-v1.webp",
-    "download-family-v1.webp"
-  ]
+    "web-manifest.json"
+  ],
+  "engineCompat": {
+    "file": "engine-compat-e42688c58cc6.wasm.gz",
+    "bytes": 9863637,
+    "rawBytes": 38439564,
+    "sha256": "e42688c58cc6675577ea6550a4a502da55ce2915c8aa2ed245db9ac21d2d2e4f",
+    "simd": false,
+    "threads": false,
+    "godotVersion": "4.7.2"
+  }
 }

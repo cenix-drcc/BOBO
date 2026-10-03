@@ -3,11 +3,13 @@
   'use strict';
   const nativeFetch = window.fetch.bind(window);
   const base = new URL('.', document.currentScript.src);
-  const version = 'bgm-live-v5-20261003';
+  const version = 'mini4-compat-v7-20261003';
   const cacheName = 'bobo-web-resources-v2';
   let manifestPromise;
   let startupPromise;
   let engine;
+  let engineEntry;
+  let startupTimer;
   const inFlight = new Map();
   const mounted = new Map();
   const memoryCache = new Map(); // Only used when persistent storage is unavailable.
@@ -28,6 +30,53 @@
   card.append(text, bar, actions); panel.append(card); document.body.append(panel);
   function show(message) { panel.style.display = 'flex'; text.textContent = message; actions.replaceChildren(); }
   function hide() { panel.style.display = 'none'; }
+  // Safari on iPadOS 15 lacks WASM SIMD. Test the feature, not the device name.
+  function supportsSimd() {
+    try {
+      return WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,0,0,1,4,1,96,0,0,3,2,1,0,10,9,1,7,0,65,0,253,15,26,11]));
+    } catch (_) { return false; }
+  }
+  function fail(error) {
+    if (metrics.firstScreenReady) return;
+    clearTimeout(startupTimer);
+    const reason = error instanceof Error ? error.message : String(error || '未知启动错误');
+    metrics.startupError = reason;
+    show('绘本暂时未能打开\n' + reason + '\n请重新加载。旧设备建议使用系统可提供的最新 Safari。');
+    text.style.whiteSpace = 'pre-line'; bar.style.display = 'none';
+    const retry = document.createElement('button');
+    retry.textContent = '重新加载'; retry.style.cssText = 'margin-top:20px;padding:12px 24px;font:inherit';
+    retry.onclick = () => location.reload(); actions.append(retry);
+  }
+  async function prepareEngine() {
+    const m = await retryable(manifest, '资源目录未能加载');
+    const simd = supportsSimd();
+    const compatible = !simd || new URLSearchParams(location.search).get('compat') === '1';
+    engineEntry = compatible ? m.engineCompat : m.engine;
+    if (!engineEntry) throw Error('此浏览器需要兼容引擎，但当前发布缺少该资源。');
+    metrics.simdSupported = simd;
+    metrics.engineVariant = compatible ? 'compat-no-simd' : 'standard-simd';
+    metrics.engineFile = engineEntry.file;
+    show(compatible ? '正在打开绘本，使用旧设备兼容模式…' : '正在打开绘本…');
+    const src = compatible ? 'index.compat.js' : 'index.js';
+    await new Promise((resolve,reject) => {
+      const script = document.createElement('script'); script.src = url(src) + '?v=' + version;
+      const timer = setTimeout(() => { script.remove(); reject(Error('引擎脚本下载超时，请检查网络后重试。')); }, 45000);
+      script.onload = () => { clearTimeout(timer); resolve(); };
+      script.onerror = () => { clearTimeout(timer); reject(Error('引擎脚本未能下载，请检查网络后重试。')); };
+      document.head.append(script);
+    });
+    window.addEventListener('error', event => { if (event.error) fail(event.error); });
+    window.addEventListener('unhandledrejection', event => fail(event.reason));
+    startupTimer = setTimeout(() => {
+      if (metrics.firstScreenReady || metrics.startupError) return;
+      show('展开书页耗时较长，正在等待设备完成启动…\n若长时间没有变化，可以重新加载或关闭其他浏览器标签。');
+      text.style.whiteSpace = 'pre-line';
+      const retry = document.createElement('button'); retry.textContent = '重新加载';
+      retry.style.cssText = 'margin-top:20px;padding:12px 24px;font:inherit';
+      retry.onclick = () => location.reload(); actions.append(retry);
+    }, 180000);
+    return engineEntry;
+  }
   function url(name) { return new URL(name, base).href; }
   function notify() { metrics.downloadStates = states; statusCallback?.(JSON.stringify(states)); }
   function state(name, status, ratio=0) { states[name]={status,ratio}; notify(); }
@@ -52,6 +101,7 @@
       .catch(e => { manifestPromise = null; throw e; }).finally(() => clearTimeout(timeout));
   }
   function report(name, done, total, title) {
+    if (metrics.startupError) return;
     if(resourceOwner?.entry.file===name) {
       const owner=resourceOwner; state(owner.name,'downloading',total?done/total:0);
       owner.update?.(done);
@@ -145,9 +195,10 @@
     startupPromise ||= retryable(async () => {
       const m = await manifest();
       progress.clear();
-      for (const entry of [m.engine, m.core]) progress.set(entry.file, {done:0,total:entry.bytes});
-      const title='正在打开绘本，仅加载封面和目录…'; show(title);
-      const [wasm,pck]=await Promise.all([decoded(m.engine,'application/wasm',title),decoded(m.core,'application/octet-stream',title)]);
+      const selectedEngine = engineEntry || m.engine;
+      for (const entry of [selectedEngine, m.core]) progress.set(entry.file, {done:0,total:entry.bytes});
+      const title=metrics.engineVariant==='compat-no-simd' ? '正在打开绘本，旧设备兼容模式，仅加载封面和目录…' : '正在打开绘本，仅加载封面和目录…'; show(title);
+      const [wasm,pck]=await Promise.all([decoded(selectedEngine,'application/wasm',title),decoded(m.core,'application/octet-stream',title)]);
       return {'index.wasm':wasm,'index.pck':pck};
     }, '打开绘本失败').catch(error=>{startupPromise=null;throw error;});
     const responses=await startupPromise;
@@ -155,15 +206,17 @@
     delete responses[name]; // Do not keep an unread tee branch holding a full decompressed WASM/PCK.
     if(response) return response;
     const m=await manifest();
-    return decoded(name==='index.wasm'?m.engine:m.core,name==='index.wasm'?'application/wasm':'application/octet-stream','正在打开绘本…');
+    return decoded(name==='index.wasm'?(engineEntry || m.engine):m.core,name==='index.wasm'?'application/wasm':'application/octet-stream','正在打开绘本…');
   };
   window.BOBOWeb = {
     metrics,
+    prepareEngine,
+    fail,
     qaEnabled: new URLSearchParams(location.search).get('qa') === '1',
     installProbe(callback) { this.probeCallback = callback; },
     probeData(json) { metrics.probe = JSON.parse(json); },
     attach(instance) { engine = instance; },
-    ready() { metrics.firstScreenReady = true; hide(); refreshStates().catch(console.error); console.info('BOBO_FIRST_SCREEN_READY', version, metrics.downloadedBytes); },
+    ready() { clearTimeout(startupTimer); delete metrics.startupError; metrics.firstScreenReady = true; hide(); refreshStates().catch(console.error); console.info('BOBO_FIRST_SCREEN_READY', version, metrics.engineVariant, metrics.downloadedBytes); },
     pageReady(info) { metrics.page = info; console.info('BOBO_PAGE_READY', JSON.stringify(info)); },
     installStatusCallback(callback) {statusCallback=callback;notify();},
     refreshStates() {refreshStates().catch(console.error);},
