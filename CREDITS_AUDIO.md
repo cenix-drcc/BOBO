@@ -79,3 +79,8 @@ Tutr-multisound-NOAA-PAGroup-03-bottlenose-dolphin-clip.mp3，截取0–3秒、�
 旧长颈鹿/棕熊/狐狸/海豚v2增益分别+3.1/+3.9/+4.6/+5dB、播放器-3dB；海雕播放器-5.9dB；狮子不变。原文件与旧版保留，许可不变。所有新增片段尚需真实听感、背景干扰与动作时机验收。
 
 audio_overrides中的用户文件不自动继承以上来源和许可。正式采用前逐项补齐记录；未核验的不标成已授权。
+
+## 用户背景音乐 · 2026-10-03（用户确认接入并授权网页发布）
+
+- Animal Family，用户提供的 `Animal Family BGM.mp3`；文件元数据作者 wangshengchen666、made with suno、生成ID `1fc403ae-6eaf-42a3-90ad-a4aeff7209ce`。账户套餐与商业分发权限未核实，不宣称CC0或第三方授权已核验。
+- 原件留在 `audio_sources/background_music/user_suno_v1/Animal_Family_original.mp3`，处理版本 `audio_overrides/background_music_v1.ogg`：立体声44.1kHz、Vorbis quality4，前2秒淡入、末3秒淡出，未做增益/变调；未改动物叫声或朗读音频。
