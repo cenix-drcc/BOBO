@@ -2,8 +2,8 @@
 (() => {
   'use strict';
   const nativeFetch = window.fetch.bind(window);
-  const base = new URL('.', document.currentScript.src);
-  const version = 'light-audio-v8-20261004';
+  const base = new URL('.', document.currentScript.src || location.href);
+  const version = 'mobile-startup-v9-20261004';
   const cacheName = 'bobo-web-resources-v2';
   let manifestPromise;
   let startupPromise;
@@ -17,6 +17,20 @@
   let statusCallback, allTask, resourceOwner;
   const metrics = {version, downloadedBytes: 0, cacheHits: 0, animals: [], phases: []};
   const pendingWrites = new Map();
+  let cacheDisabled = false, cachePromise;
+  // Some mobile/private-mode implementations leave CacheStorage promises
+  // unresolved. Persistence is an optimization, never a startup dependency.
+  async function storage(work) {
+    if(cacheDisabled)return null;
+    let timer;
+    try { return await Promise.race([Promise.resolve().then(work),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('cache-timeout')),1500);})]); }
+    catch(error){cacheDisabled=true;metrics.cacheFallback=error.message;return null;}
+    finally{clearTimeout(timer);}
+  }
+  async function openCache() {
+    if(cacheDisabled)return null;
+    return cachePromise ||= storage(()=>caches.open(cacheName));
+  }
   const progress = new Map();
   const panel = document.createElement('div');
   panel.id = 'bobo-loading';
@@ -29,7 +43,7 @@
   bar.style.cssText = 'width:100%;height:14px;margin-top:22px;accent-color:#66816a';
   bar.setAttribute('aria-label','资源下载进度');
   card.append(text, bar, actions); panel.append(card); document.body.append(panel);
-  function show(message) { panel.style.display = 'flex'; text.textContent = message; actions.replaceChildren(); }
+  function show(message) { window.BoboBoot?.handoff(); panel.style.display = 'flex'; text.textContent = message; actions.replaceChildren(); }
   function hide() { panel.style.display = 'none'; }
   // Safari on iPadOS 15 lacks WASM SIMD. Test the feature, not the device name.
   function supportsSimd() {
@@ -38,7 +52,7 @@
     } catch (_) { return false; }
   }
   function phase(stage) {
-    if(metrics.firstScreenReady || metrics.startupError)return;
+    if(metrics.firstScreenReady || metrics.startupError || actions.childElementCount)return;
     if(metrics.startupPhase!==stage)metrics.phases.push({stage,ms:Math.round(performance.now())});
     metrics.startupPhase=stage;
     const complete=progress.size && [...progress.values()].every(p=>p.done===p.total);
@@ -71,10 +85,11 @@
     retry.onclick = () => location.reload(); actions.append(retry);
   }
   async function prepareEngine() {
-    if(typeof WebAssembly!=='object' || typeof BigInt64Array!=='function')throw Error('此浏览器版本过旧，缺少绘本引擎所需能力。请更新系统或使用 Safari。');
+    show('正在连接绘本资源目录…');
+    if(typeof WebAssembly!=='object' || typeof BigInt64Array!=='function' || typeof WebAssembly.Tag!=='function')throw Error('浏览器内核缺少 WebAssembly / BigInt / 异常处理能力。请更新浏览器；安卓可尝试最新版 Chrome，iPad 请使用更新后的 Safari。');
     const testCanvas=document.createElement('canvas');
     const gl=testCanvas.getContext('webgl2');
-    if(!gl)throw Error('此浏览器无法启用 WebGL2。请关闭其他标签后使用 Safari 重试。');
+    if(!gl)throw Error('浏览器无法启用 WebGL2。请关闭其他标签后重试；安卓可尝试最新版 Chrome，iPad 请使用 Safari。');
     gl.getExtension('WEBGL_lose_context')?.loseContext();
     const m = await retryable(manifest, '资源目录未能加载');
     const simd = supportsSimd();
@@ -87,6 +102,9 @@
     metrics.renderPixelRatio=window.devicePixelRatio||1;
     metrics.engineFile = engineEntry.file;
     show(compatible ? '正在打开绘本，使用旧设备兼容模式…' : '正在打开绘本…');
+    // Fetch the large verified resources alongside the engine glue instead
+    // of adding another full network round trip before their download starts.
+    startResources();
     const src = compatible ? 'index.compat.js' : 'index.js';
     await new Promise((resolve,reject) => {
       const script = document.createElement('script'); script.src = url(src) + '?v=' + version;
@@ -98,7 +116,7 @@
     window.addEventListener('error', event => { if (event.error) fail(event.error); });
     window.addEventListener('unhandledrejection', event => fail(event.reason));
     startupTimer = setTimeout(() => {
-      if (metrics.firstScreenReady || metrics.startupError) return;
+      if (metrics.firstScreenReady || metrics.startupError || actions.childElementCount) return;
       show('展开书页耗时较长，正在等待设备完成启动…\n若长时间没有变化，可以重新加载或关闭其他浏览器标签。');
       text.style.whiteSpace = 'pre-line';
       const retry = document.createElement('button'); retry.textContent = '重新加载';
@@ -113,7 +131,8 @@
   function cancelled(signal) { if(signal?.aborted) throw new DOMException('用户取消下载','AbortError'); }
   async function available(entry) {
     if(memoryCache.has(entry.file))return true;
-    try{return !!(await (await caches.open(cacheName)).match(url(entry.file)));}catch(_){return false;}
+    const cache=await openCache();
+    return !!(cache && await storage(()=>cache.match(url(entry.file))));
   }
   async function refreshStates() {
     const m=await manifest();
@@ -124,6 +143,9 @@
   }
   function manifest() {
     if (manifestPromise) return manifestPromise;
+    // The build embeds its matching manifest: no extra serial request or
+    // mixed old/new release while GitHub Pages caches are being refreshed.
+    if(window.BoboEmbeddedManifest?.version===version)return manifestPromise=Promise.resolve(window.BoboEmbeddedManifest);
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(),45000);
     return manifestPromise ||= nativeFetch(url('web-manifest.json') + '?v=' + version, {cache:'no-cache',signal:controller.signal})
@@ -154,13 +176,12 @@
   }
   async function compressedResponse(entry, title, signal, quiet=false) {
     cancelled(signal);
-    let cache;
-    try { cache = await caches.open(cacheName); } catch (_) { /* Private browsing / quota: network fallback. */ }
     const address = url(entry.file);
     let response;
-    if(pendingWrites.has(address))await pendingWrites.get(address);
-    try { response = cache && await cache.match(address); } catch (_) {}
-    if(!response && memoryCache.has(entry.file))response=new Response(memoryCache.get(entry.file));
+    // Read the verified in-memory result before waiting on any disk write.
+    if(memoryCache.has(entry.file))response=new Response(memoryCache.get(entry.file));
+    const cache=response?null:await openCache();
+    if(!response && cache)response=await storage(()=>cache.match(address));
     if (response) { cancelled(signal);metrics.cacheHits++; if(!quiet)report(entry.file, entry.bytes, entry.bytes, title); return response; }
     const controller = new AbortController();
     const abort=()=>controller.abort(); signal?.addEventListener('abort',abort,{once:true});
@@ -189,7 +210,7 @@
       response = new Response(blob, {headers:{'Content-Type':entry.mime||'application/gzip'}});
       // Disk persistence must not hold up decoding/engine initialization.
       memoryCache.set(entry.file,blob);
-      if(cache){const write=cache.put(address,response.clone()).then(()=>memoryCache.delete(entry.file)).catch(()=>{}).finally(()=>pendingWrites.delete(address));pendingWrites.set(address,write);}
+      if(cache){const write=storage(async()=>{await cache.put(address,response.clone());return true;}).then(ok=>{if(ok)memoryCache.delete(entry.file);}).finally(()=>pendingWrites.delete(address));pendingWrites.set(address,write);}
       cancelled(signal);
       return response;
     } finally { clearTimeout(timer);signal?.removeEventListener('abort',abort); }
@@ -225,10 +246,7 @@
       }
     }
   }
-  window.fetch = async (input, options) => {
-    const address = new URL(typeof input === 'string' ? input : input instanceof URL ? input.href : input.url, location.href);
-    const name = address.pathname.slice(base.pathname.length);
-    if (address.origin !== base.origin || !address.pathname.startsWith(base.pathname) || !['index.wasm','index.pck'].includes(name)) return nativeFetch(input, options);
+  function startResources() {
     // Both Godot startup fetches share one retry flow. Separate dialogs would
     // strand one promise if WASM and PCK fail together on an unstable network.
     startupPromise ||= retryable(async () => {
@@ -241,6 +259,15 @@
       phase('compile');
       return {'index.wasm':wasm,'index.pck':pck};
     }, '打开绘本失败').catch(error=>{startupPromise=null;throw error;});
+    // The glue can fail while prefetch is active; keep its promise handled.
+    startupPromise.catch(()=>{});
+    return startupPromise;
+  }
+  window.fetch = async (input, options) => {
+    const address = new URL(typeof input === 'string' ? input : input instanceof URL ? input.href : input.url, location.href);
+    const name = address.pathname.slice(base.pathname.length);
+    if (address.origin !== base.origin || !address.pathname.startsWith(base.pathname) || !['index.wasm','index.pck'].includes(name)) return nativeFetch(input, options);
+    startResources();
     const responses=await startupPromise;
     const response=responses[name];
     delete responses[name]; // Do not keep an unread tee branch holding a full decompressed WASM/PCK.

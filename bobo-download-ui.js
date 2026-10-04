@@ -1,6 +1,6 @@
 /* Download overlay only. Gameplay remains in Godot; no account/save additions. */
 (() => {
-  const base = new URL('.', document.currentScript.src);
+  const base = new URL('.', document.currentScript.src || location.href);
   const root = document.createElement('div');
   root.id = 'bobo-course-overlay'; root.hidden = true;
   root.innerHTML = `<section class="bobo-download-paper" role="dialog" aria-modal="true" aria-labelledby="bobo-download-title">

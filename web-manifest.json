@@ -1,5 +1,5 @@
 {
-  "version": "light-audio-v8-20261004",
+  "version": "mobile-startup-v9-20261004",
   "engine": {
     "file": "engine-fbeeda862033.wasm.gz",
     "bytes": 6828500,
@@ -11,10 +11,10 @@
     "profile": "bobo-2d"
   },
   "core": {
-    "file": "core-da6736c6dd40.pck.gz",
-    "bytes": 1075708,
-    "rawBytes": 1125112,
-    "sha256": "da6736c6dd401cb097aa93e984f769655146add6511cb6e8a8610ce4d7aa173b"
+    "file": "core-6d8818014490.pck.gz",
+    "bytes": 1077302,
+    "rawBytes": 1126720,
+    "sha256": "6d8818014490cb56a79807d2744c894044c9fbe1a9189b8bff34574963b41a4c"
   },
   "animals": {
     "非洲象": {
@@ -300,7 +300,7 @@
     "brown_bear-46d080d68ac6.pck.gz",
     "brown_throated_sloth-71e1fa03e538.pck.gz",
     "common_octopus-c432450c03e0.pck.gz",
-    "core-da6736c6dd40.pck.gz",
+    "core-6d8818014490.pck.gz",
     "download-elephant-v3.webp",
     "download-family-v1.webp",
     "eastern_gorilla-fa7975c76e8b.pck.gz",

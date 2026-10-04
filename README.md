@@ -1,6 +1,6 @@
 # BOBO 动态绘本
 
-light-audio-v8-20261004
+mobile-startup-v9-20261004
 
 2D-only、非 SIMD 引擎；Retina 画布；旧设备限制30fps。
 封面/目录首屏，20动物按需加载；TT朗读原始MP3不改，BGM浏览器兼容MP3衍生版。

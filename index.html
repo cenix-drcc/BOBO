@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
@@ -95,6 +95,48 @@ body {
 
 	</head>
 	<body>
+<!-- This status/error path deliberately uses ES5 and zero external resources. -->
+<div id="bobo-boot" role="status" style="position:fixed;inset:0;z-index:2001;background:#f8f4ea;color:#384b43;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;font:18px system-ui;line-height:1.6">
+  <div style="max-width:520px"><div style="font-size:25px;margin-bottom:16px">BOBO 家 · 会呼吸的绘本</div><div id="bobo-boot-message">正在连接绘本…</div><div id="bobo-boot-detail" style="font-size:13px;overflow-wrap:anywhere;margin-top:14px"></div><button id="bobo-boot-retry" type="button" style="display:none;margin:20px auto 0;padding:12px 24px;font:inherit;border:1px solid #a7b698;border-radius:8px;background:#eef0e3;color:#384b43">重新加载</button></div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bobo-boot');
+  var title = document.getElementById('bobo-boot-message');
+  var detail = document.getElementById('bobo-boot-detail');
+  var retry = document.getElementById('bobo-boot-retry');
+  var handed = false;
+  retry.onclick = function () { location.reload(); };
+  function fail(message) {
+    root.hidden = false; root.style.display = 'flex';
+    title.textContent = message;
+    detail.textContent = '版本 mobile-startup-v9-20261004 · ' + navigator.userAgent;
+    retry.style.display = 'block';
+  }
+  window.BoboBoot = {
+    supported: true,
+    handoff: function () { handed = true; root.hidden = true; root.style.display = 'none'; },
+    fail: fail
+  };
+  window.addEventListener('error', function (event) {
+    if (window.BOBOWeb && window.BOBOWeb.metrics.firstScreenReady) return;
+    if (event.target && event.target.tagName === 'SCRIPT') fail('启动文件没有下载成功，请检查网络后重试。');
+    else if (event.message) fail('绘本启动遇到错误：' + event.message + '。安卓请尝试更新浏览器或使用最新版 Chrome，iPad 请使用更新后的 Safari。');
+  }, true);
+  try {
+    new Function('var a; a ||= 1; return ({a:a})?.a ?? 0;');
+    if (!window.WebAssembly || typeof WebAssembly.Tag !== 'function' || typeof BigInt64Array !== 'function') throw new Error('WebAssembly');
+    if (!window.fetch || !window.ReadableStream || !window.crypto || !crypto.subtle || !Element.prototype.replaceChildren) throw new Error('Web API');
+  } catch (error) {
+    window.BoboBoot.supported = false;
+    fail('当前浏览器内核不支持这本绘本，不必继续等待。请更新浏览器；安卓可尝试最新版 Chrome，iPad 请使用更新后的 Safari。');
+  }
+  setTimeout(function () {
+    if (!handed && window.BoboBoot.supported) fail('启动文件连接较慢，请检查网络。资源到达后会继续打开。');
+  }, 45000);
+}());
+</script>
+
 		<canvas id="canvas">
 			Your browser does not support the canvas tag.
 		</canvas>
@@ -109,14 +151,568 @@ body {
 			<div id="status-notice"></div>
 		</div>
 
-		<link rel="stylesheet" href="bobo-download-ui.css?v=light-audio-v8-20261004">
-<script src="bobo-download-ui.js?v=light-audio-v8-20261004"></script>
-<script src="bobo-slim-loader.js?v=light-audio-v8-20261004"></script>
-<script src="bobo-native-audio.js?v=light-audio-v8-20261004"></script>
+		<style>#bobo-course-overlay[hidden],#bobo-course-overlay [hidden]{display:none!important}
+#bobo-course-overlay{position:fixed;inset:0;z-index:1100;display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:24px;background:rgba(22,29,26,.72);font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:#43554b;text-align:center;overflow:auto;touch-action:manipulation}
+#bobo-course-overlay *{box-sizing:border-box}
+.bobo-download-paper{width:min(510px,100%);padding:32px 38px 26px;border:1px solid #d8ceba;border-radius:16px 13px 18px 12px;background-color:#f7f2e6;background-image:radial-gradient(#98836915 .6px,transparent .9px),radial-gradient(#fff9eb70 1px,transparent 2px);background-size:7px 11px,13px 17px;box-shadow:0 10px 34px #0b171936,inset 0 0 24px #d3c5a91c}
+.bobo-download-kicker{font-size:13px;color:#8b806b;letter-spacing:1px}
+#bobo-course-overlay h2{font-weight:500;font-size:29px;line-height:1.3;margin:15px 0}
+.bobo-download-message{font-size:17px;line-height:1.6;min-height:28px;margin:0}
+.bobo-progress-scene{position:relative;padding-top:104px;margin:6px 0 15px}
+.bobo-mini-elephant{position:absolute;width:104px;height:104px;bottom:6px;left:0;background-size:300% 200%;background-repeat:no-repeat;transition:left .14s linear;image-rendering:auto}
+.bobo-course-track{height:16px;border:1px solid #b4bba1;border-radius:12px;background:#e3e6d6;overflow:hidden;box-shadow:inset 0 1px 3px #63776418}
+.bobo-course-fill{height:100%;width:0;background:linear-gradient(0deg,#7a9471,#9eb18c);border-radius:10px;transition:width .14s linear}
+.bobo-progress-numbers{display:flex;justify-content:space-between;align-items:baseline;font-size:15px;color:#65765e}
+.bobo-progress-numbers strong{font-size:24px;font-weight:500}
+.bobo-download-detail{font-size:12px;line-height:1.7;color:#958b76;margin:17px 0 20px}
+#bobo-course-overlay button{font:inherit;cursor:pointer;min-height:44px;padding:10px 29px;border-radius:9px;border:1px solid #b7b39c;color:#47594d;background:#f8f3e7}
+#bobo-course-overlay button:hover{background:#e8ecdf}
+#bobo-course-overlay button:focus-visible{outline:3px solid #90ac84;outline-offset:4px}
+.bobo-download-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.bobo-download-success{width:min(510px,100%);color:#fcf8ed;padding:15px 10px}
+.bobo-family{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}
+#bobo-course-overlay .bobo-download-success h2{font-size:34px;margin:20px 0 8px;letter-spacing:3px}
+.bobo-download-success p{font-size:21px;margin:0 0 28px;letter-spacing:2px}
+#bobo-course-overlay .bobo-ack{min-width:185px;background:#ffffff32;border-color:#ffffff66;color:#fffdf4;border-radius:24px}
+#bobo-course-overlay .bobo-ack:hover{background:#ffffff48}
+@media(max-width:480px){#bobo-course-overlay{padding:18px}.bobo-download-paper{padding:25px 24px}.bobo-download-kicker{font-size:11px}#bobo-course-overlay h2{font-size:25px}.bobo-download-message{font-size:15px}.bobo-download-success p{font-size:18px}}
+@media(max-height:480px){.bobo-download-paper{padding:14px 28px}#bobo-course-overlay h2{margin:8px 0}.bobo-progress-scene{padding-top:78px}.bobo-mini-elephant{height:80px;width:80px}.bobo-download-detail{margin:8px 0}.bobo-family{max-height:180px;width:auto;max-width:100%}.bobo-download-success p{margin-bottom:15px}}
+</style>
+<script>/* Download overlay only. Gameplay remains in Godot; no account/save additions. */
+(() => {
+  const base = new URL('.', document.currentScript.src || location.href);
+  const root = document.createElement('div');
+  root.id = 'bobo-course-overlay'; root.hidden = true;
+  root.innerHTML = `<section class="bobo-download-paper" role="dialog" aria-modal="true" aria-labelledby="bobo-download-title">
+    <div class="bobo-download-kicker">BOBO 家 / 把小世界装进绘本</div>
+    <h2 id="bobo-download-title">正在下载全课程</h2>
+    <p class="bobo-download-message">动物朋友正在赶来…</p>
+    <div class="bobo-progress-scene"><div class="bobo-mini-elephant" role="img" aria-label="向右奔跑的小象"></div>
+      <div class="bobo-course-track" role="progressbar" aria-label="全课程下载进度" aria-valuemin="0" aria-valuemax="100"><div class="bobo-course-fill"></div></div>
+    </div>
+    <div class="bobo-progress-numbers"><strong>0%</strong><span>已完成 0 / 20</span></div>
+    <p class="bobo-download-detail">完整下载后，下次打开会优先使用浏览器缓存。</p>
+    <div class="bobo-download-actions"><button class="bobo-retry" hidden>继续下载</button><button class="bobo-cancel">取消下载</button></div>
+  </section>
+  <section class="bobo-download-success" role="dialog" aria-modal="true" aria-labelledby="bobo-success-title" hidden>
+    <img class="bobo-family" alt="小象、小熊、狐狸和熊猫相伴在一起" />
+    <h2 id="bobo-success-title">下载成功</h2><p>请开始学习吧</p><button class="bobo-ack">我知道啦！</button>
+  </section>`;
+  document.body.append(root);
+  const find = s => root.querySelector(s), paper=find('.bobo-download-paper'), success=find('.bobo-download-success');
+  find('.bobo-family').src = new URL('download-family-v1.webp',base);
+  const sprite=find('.bobo-mini-elephant'); sprite.style.backgroundImage=`url("${new URL('download-elephant-v3.webp',base)}")`;
+  let frame=0, previousFocus, handlers={}, ticker;
+  const positions=['0% 0%','50% 0%','100% 0%','0% 100%','50% 100%','100% 100%'];
+  function stop() {clearInterval(ticker);ticker=null;sprite.classList.remove('running');}
+  function start() {stop(); sprite.classList.add('running');ticker=setInterval(()=>{frame=(frame+1)%6;sprite.style.backgroundPosition=positions[frame];},135);}
+  function open() { if(root.hidden) previousFocus=document.activeElement; root.hidden=false; }
+  function close() {stop();root.hidden=true;previousFocus?.focus?.();handlers={};}
+  find('.bobo-cancel').onclick=()=>handlers.cancel?.();
+  find('.bobo-retry').onclick=()=>handlers.retry?.();
+  find('.bobo-ack').onclick=close;
+  // The mask owns input while open; keyboard cannot flip underlying book pages.
+  document.addEventListener('keydown',event=>{
+    if(root.hidden)return;
+    if(event.key==='Tab') {
+      const buttons=[...root.querySelectorAll('button')].filter(b=>!b.hidden && !b.closest('[hidden]'));
+      const i=buttons.indexOf(document.activeElement);
+      buttons[(i+(event.shiftKey?-1:1)+buttons.length)%buttons.length]?.focus();
+    } else if(event.key==='Escape') {if(!success.hidden)close();else handlers.cancel?.();}
+    event.preventDefault();event.stopImmediatePropagation();
+  },true);
+  window.BoboDownloadUI={
+    begin(cancel) {open();paper.hidden=false;success.hidden=true;handlers={cancel};find('.bobo-retry').hidden=true;find('.bobo-download-message').textContent='动物朋友正在赶来…';start();find('.bobo-cancel').focus();},
+    progress(ratio,count,total,name) {
+      const pct=Math.min(100,Math.floor(ratio*100));
+      find('.bobo-course-track').setAttribute('aria-valuenow',pct);
+      find('.bobo-course-fill').style.width=pct+'%';
+      // Frame drawings are never warped; only the mascot's position changes.
+      sprite.style.left=`calc(${pct}% - ${pct/100*104}px)`;
+      find('.bobo-progress-numbers strong').textContent=pct+'%';
+      find('.bobo-progress-numbers span').textContent=`已完成 ${count} / ${total}`;
+      find('.bobo-download-message').textContent=name ? `正在下载：${name}` : '正在检查已下载的资源…';
+    },
+    error(message,retry) {stop();find('.bobo-download-message').textContent=message;find('.bobo-retry').hidden=false;handlers.retry=()=>{find('.bobo-retry').hidden=true;start();retry();};find('.bobo-retry').focus();},
+    success() {stop();open();paper.hidden=true;success.hidden=false;handlers={};find('.bobo-ack').focus();},
+    close,
+  };
+})();
+</script>
+<script>window.BoboEmbeddedManifest={"version":"mobile-startup-v9-20261004","engine":{"file":"engine-fbeeda862033.wasm.gz","bytes":6828500,"rawBytes":27634060,"sha256":"fbeeda862033eb7732aa9ddce929e6b6baabb31e99c35a9b5113a72287686f6c","simd":false,"threads":false,"godotVersion":"4.7.2","profile":"bobo-2d"},"core":{"file":"core-6d8818014490.pck.gz","bytes":1077302,"rawBytes":1126720,"sha256":"6d8818014490cb56a79807d2744c894044c9fbe1a9189b8bff34574963b41a4c"},"animals":{"非洲象":{"file":"african_elephant-c241f1a4ddd8.pck.gz","bytes":1373352,"rawBytes":1388396,"sha256":"c241f1a4ddd89993966cac95363498e86df744e3a058bc34032936e0f0840c3b","id":"african_elephant","narration":{"file":"narration-african_elephant-aa5e49505641.mp3","bytes":149328,"sha256":"aa5e4950564181b1a81c24bde99f002ba858b9cea2f732f84a530f8aabde8cec","mime":"audio/mpeg"}},"长颈鹿":{"file":"giraffe-3c7855bad01f.pck.gz","bytes":1016291,"rawBytes":1028872,"sha256":"3c7855bad01f2f0fce86cd03e4baaa2df911955be0ff9a574179c7a722b97380","id":"giraffe","narration":{"file":"narration-giraffe-cc39fd9a18f0.mp3","bytes":117648,"sha256":"cc39fd9a18f071967f9c7a8f356e05a8b01d5bbe5653b1c4502bdb9effb23ea7","mime":"audio/mpeg"}},"狮子":{"file":"lion-e94495e2abd7.pck.gz","bytes":2199630,"rawBytes":2220112,"sha256":"e94495e2abd73ed5884b42f90895f2d3853df1617711d58c8afd0897324f070b","id":"lion","narration":{"file":"narration-lion-03353ed294f5.mp3","bytes":120960,"sha256":"03353ed294f5a4648149e7a94891ac746ed6d4cefd91077812455e9c5a16991c","mime":"audio/mpeg"}},"平原斑马":{"file":"plains_zebra-c96e8ca24869.pck.gz","bytes":1657436,"rawBytes":1676296,"sha256":"c96e8ca248699b6d6f0f918b5b86e6440a397b19633f7e94b77f8873101b8979","id":"plains_zebra","narration":{"file":"narration-plains_zebra-cb7dc9709eb4.mp3","bytes":111888,"sha256":"cb7dc9709eb4504a58acbd111bf0973060573e47d8017a7796f9b4aa40d76ce2","mime":"audio/mpeg"}},"大熊猫":{"file":"giant_panda-3e15ed199bc5.pck.gz","bytes":932434,"rawBytes":961328,"sha256":"3e15ed199bc5cb6fa4a0890fad2bb6770833fdaf0626b531badb727358bff497","id":"giant_panda","narration":{"file":"narration-giant_panda-a586dd1eefc6.mp3","bytes":129168,"sha256":"a586dd1eefc6f0b0470ff3b3a0e9dfd6dc88cd22e75581cc449be0fd10d1707c","mime":"audio/mpeg"}},"棕熊":{"file":"brown_bear-46d080d68ac6.pck.gz","bytes":1004434,"rawBytes":1020968,"sha256":"46d080d68ac65f25fffa60ad1f67f0a7dc3c01b02d4e120a4f82990cc54bd539","id":"brown_bear","narration":{"file":"narration-brown_bear-74b3fd5e20a7.mp3","bytes":129024,"sha256":"74b3fd5e20a7f7f5389dcda0efa3deec6588e97c7b2d58cfb751976a0a93e2d9","mime":"audio/mpeg"}},"红狐狸":{"file":"red_fox-c3a514291b41.pck.gz","bytes":945760,"rawBytes":959808,"sha256":"c3a514291b41d3ae5214689cc7f95c5c0b9fd02d8fe5eb4a6d03b20fd8b1822f","id":"red_fox","narration":{"file":"narration-red_fox-1a91ab4534ee.mp3","bytes":123264,"sha256":"1a91ab4534ee3e8f8f2ccd38aa4836a9c68b3a7c059d1e69bb71e23e0e3d1564","mime":"audio/mpeg"}},"梅花鹿":{"file":"sika_deer-4ab0ec9bd006.pck.gz","bytes":945830,"rawBytes":958316,"sha256":"4ab0ec9bd006702a3fa56e3f2523ab357bf60430b28d26f7ff04dba2838cb814","id":"sika_deer","narration":{"file":"narration-sika_deer-2874d6305a1d.mp3","bytes":123408,"sha256":"2874d6305a1d97c970a85252a2705391649af5b2fea86c793d8fda2aed901e2c","mime":"audio/mpeg"}},"北极熊":{"file":"polar_bear-a0a767acec7f.pck.gz","bytes":1092774,"rawBytes":1111152,"sha256":"a0a767acec7f4b3cbfd379b1ceacbbebe9a6035fb7f69d9a00484f42c715d897","id":"polar_bear","narration":{"file":"narration-polar_bear-a8ed6a355081.mp3","bytes":125712,"sha256":"a8ed6a355081f8cda3bf60b0c589b0827555e7700e5235ea643a3496014c91e4","mime":"audio/mpeg"}},"帝企鹅":{"file":"emperor_penguin-5f65d49fdad0.pck.gz","bytes":516185,"rawBytes":531432,"sha256":"5f65d49fdad0471bc28972d8ddb58410bbdb559148f6ad03954bede888e638be","id":"emperor_penguin","narration":{"file":"narration-emperor_penguin-505dcefbcab9.mp3","bytes":128448,"sha256":"505dcefbcab99c56e66d04ddeefcd53741e547e5cf8e9647e93239852031c49c","mime":"audio/mpeg"}},"竖琴海豹":{"file":"harp_seal-401f8b675f4c.pck.gz","bytes":960836,"rawBytes":980292,"sha256":"401f8b675f4cebf76f8295a6db25c32ed3d8dacf0ee9b303d6c803205675ad83","id":"harp_seal","narration":{"file":"narration-harp_seal-aa6240308a39.mp3","bytes":129888,"sha256":"aa6240308a39ac4dde4b67f7db1a5e49ba736a1af576f162931c3d5f3b98d454","mime":"audio/mpeg"}},"宽吻海豚":{"file":"bottlenose_dolphin-84e1c63ffc05.pck.gz","bytes":508728,"rawBytes":520932,"sha256":"84e1c63ffc0579a114a156d8df97359a8d6dbbecd6c72beab7fd019bf099d8bd","id":"bottlenose_dolphin","narration":{"file":"narration-bottlenose_dolphin-f8c4b0f13048.mp3","bytes":120528,"sha256":"f8c4b0f13048d7c17a0d9a5567ec0ba176f245f8edc7c075b47dd1b2d15f1e7f","mime":"audio/mpeg"}},"绿海龟":{"file":"green_sea_turtle-25189ef2de15.pck.gz","bytes":664508,"rawBytes":679028,"sha256":"25189ef2de15ceb02ab640d3b4ef7c73b2a034a3abe43bb120d2a9d384218303","id":"green_sea_turtle","narration":{"file":"narration-green_sea_turtle-e78ad917bc4a.mp3","bytes":125280,"sha256":"e78ad917bc4abb9cce0dbaeb3074ea7a1658282ad780394648a555c2a301a5c4","mime":"audio/mpeg"}},"普通章鱼":{"file":"common_octopus-c432450c03e0.pck.gz","bytes":658152,"rawBytes":670140,"sha256":"c432450c03e0510e2b174d55bd1f9f91265240407c3694e4bf61a69d60f28fe7","id":"common_octopus","narration":{"file":"narration-common_octopus-49f948f95f1f.mp3","bytes":123408,"sha256":"49f948f95f1fdcdd631a1a727e45c63d33317b2cc3ea6fa2aef56e3b17e630e9","mime":"audio/mpeg"}},"孟加拉虎":{"file":"bengal_tiger-07291bc462dd.pck.gz","bytes":958501,"rawBytes":980288,"sha256":"07291bc462ddc85148c46910d6cf7f8f52397ee8f59d706bacad94633be4736d","id":"bengal_tiger","narration":{"file":"narration-bengal_tiger-988a8584f769.mp3","bytes":131904,"sha256":"988a8584f76909faf893340f2f503190ff72093c4fe346d5959b63a5b98e8cdc","mime":"audio/mpeg"}},"东部大猩猩":{"file":"eastern_gorilla-fa7975c76e8b.pck.gz","bytes":871218,"rawBytes":888380,"sha256":"fa7975c76e8b51560d8024f97af4d324ad354e15230dbaab8dfb9c8aea0adf6d","id":"eastern_gorilla","narration":{"file":"narration-eastern_gorilla-7422ad68722e.mp3","bytes":124128,"sha256":"7422ad68722e050cbd5301c151355dcb705e736c1281308ff421e47c652b662d","mime":"audio/mpeg"}},"褐喉三趾树懒":{"file":"brown_throated_sloth-71e1fa03e538.pck.gz","bytes":799576,"rawBytes":814220,"sha256":"71e1fa03e53837c74dfd109dded312abbe8bbd0cfbfdab80048cf4cacff4ce41","id":"brown_throated_sloth","narration":{"file":"narration-brown_throated_sloth-441ca1e41b74.mp3","bytes":135216,"sha256":"441ca1e41b74424fe1cb1271e655006bfdd6ba47c6c52bb13f41a91b417d8e20","mime":"audio/mpeg"}},"白头海雕":{"file":"bald_eagle-44d5be47ad2f.pck.gz","bytes":860154,"rawBytes":873492,"sha256":"44d5be47ad2f5ee0f3eeae6ba05639981714da040318f895a88c30456e46f9e4","id":"bald_eagle","narration":{"file":"narration-bald_eagle-aeb3e2207140.mp3","bytes":139104,"sha256":"aeb3e22071403f50ebede1ac96c3ea5cce597cc19b0b57e886eadfe76b5b0389","mime":"audio/mpeg"}},"大红鹳（火烈鸟）":{"file":"greater_flamingo-6f751baa341f.pck.gz","bytes":604606,"rawBytes":623876,"sha256":"6f751baa341fd88928a712e0dad072c6abc7033978a3441ae5ef7b9bcc639a89","id":"greater_flamingo","narration":{"file":"narration-greater_flamingo-a9a86b2a4d58.mp3","bytes":129312,"sha256":"a9a86b2a4d58593fed30cd753b08433c4a140e3f9210da3288c3f7c727b66341","mime":"audio/mpeg"}},"红眼树蛙":{"file":"red_eyed_tree_frog-eac20d2d44f0.pck.gz","bytes":721215,"rawBytes":735748,"sha256":"eac20d2d44f06798139760055f2f3e1e96fe44a67fe8c6e2f677e358faa78287","id":"red_eyed_tree_frog","narration":{"file":"narration-red_eyed_tree_frog-1d6eac3c5b44.mp3","bytes":145008,"sha256":"1d6eac3c5b44af9852892e0c4391c1b822d00101ed3d9f0ad4e0c816704eb0fe","mime":"audio/mpeg"}}},"files":[".nojekyll","CREDITS_AUDIO.md","GODOT-COPYRIGHT.txt","GODOT-LICENSE.txt","LICENSE-fflate.txt","NARRATION_LICENSE.txt","OFL-NotoSansSC.txt","README.md","african_elephant-c241f1a4ddd8.pck.gz","background-music-2b65a51ef1e0.mp3","bald_eagle-44d5be47ad2f.pck.gz","bengal_tiger-07291bc462dd.pck.gz","bobo-download-ui.css","bobo-download-ui.js","bobo-gzip-worker.js","bobo-native-audio.js","bobo-slim-loader.js","bottlenose_dolphin-84e1c63ffc05.pck.gz","brown_bear-46d080d68ac6.pck.gz","brown_throated_sloth-71e1fa03e538.pck.gz","common_octopus-c432450c03e0.pck.gz","core-6d8818014490.pck.gz","download-elephant-v3.webp","download-family-v1.webp","eastern_gorilla-fa7975c76e8b.pck.gz","emperor_penguin-5f65d49fdad0.pck.gz","engine-fbeeda862033.wasm.gz","fflate-0.8.3.js","giant_panda-3e15ed199bc5.pck.gz","giraffe-3c7855bad01f.pck.gz","greater_flamingo-6f751baa341f.pck.gz","green_sea_turtle-25189ef2de15.pck.gz","harp_seal-401f8b675f4c.pck.gz","index.apple-touch-icon.png","index.audio.position.worklet.js","index.audio.worklet.js","index.compat.js","index.html","index.icon.png","index.js","index.png","lion-e94495e2abd7.pck.gz","narration-african_elephant-aa5e49505641.mp3","narration-bald_eagle-aeb3e2207140.mp3","narration-bengal_tiger-988a8584f769.mp3","narration-bottlenose_dolphin-f8c4b0f13048.mp3","narration-brown_bear-74b3fd5e20a7.mp3","narration-brown_throated_sloth-441ca1e41b74.mp3","narration-common_octopus-49f948f95f1f.mp3","narration-eastern_gorilla-7422ad68722e.mp3","narration-emperor_penguin-505dcefbcab9.mp3","narration-giant_panda-a586dd1eefc6.mp3","narration-giraffe-cc39fd9a18f0.mp3","narration-greater_flamingo-a9a86b2a4d58.mp3","narration-green_sea_turtle-e78ad917bc4a.mp3","narration-harp_seal-aa6240308a39.mp3","narration-lion-03353ed294f5.mp3","narration-plains_zebra-cb7dc9709eb4.mp3","narration-polar_bear-a8ed6a355081.mp3","narration-red_eyed_tree_frog-1d6eac3c5b44.mp3","narration-red_fox-1a91ab4534ee.mp3","narration-sika_deer-2874d6305a1d.mp3","plains_zebra-c96e8ca24869.pck.gz","polar_bear-a0a767acec7f.pck.gz","red_eyed_tree_frog-eac20d2d44f0.pck.gz","red_fox-c3a514291b41.pck.gz","sika_deer-4ab0ec9bd006.pck.gz","web-manifest.json"],"music":{"file":"background-music-2b65a51ef1e0.mp3","bytes":1498796,"sha256":"2b65a51ef1e0ecacc1e1e43bf2e170c118306c1b38351cccf009257d5fcfe63b","mime":"audio/mpeg"},"engineCompat":{"file":"engine-fbeeda862033.wasm.gz","bytes":6828500,"rawBytes":27634060,"sha256":"fbeeda862033eb7732aa9ddce929e6b6baabb31e99c35a9b5113a72287686f6c","simd":false,"threads":false,"godotVersion":"4.7.2","profile":"bobo-2d"}};</script>
+<script>/* BOBO: compressed first screen, then one animal pack on demand. No CDN dependency. */
+(() => {
+  'use strict';
+  const nativeFetch = window.fetch.bind(window);
+  const base = new URL('.', document.currentScript.src || location.href);
+  const version = 'mobile-startup-v9-20261004';
+  const cacheName = 'bobo-web-resources-v2';
+  let manifestPromise;
+  let startupPromise;
+  let engine;
+  let engineEntry;
+  let startupTimer;
+  const inFlight = new Map();
+  const mounted = new Map();
+  const memoryCache = new Map(); // Only used when persistent storage is unavailable.
+  const states = {};
+  let statusCallback, allTask, resourceOwner;
+  const metrics = {version, downloadedBytes: 0, cacheHits: 0, animals: [], phases: []};
+  const pendingWrites = new Map();
+  let cacheDisabled = false, cachePromise;
+  // Some mobile/private-mode implementations leave CacheStorage promises
+  // unresolved. Persistence is an optimization, never a startup dependency.
+  async function storage(work) {
+    if(cacheDisabled)return null;
+    let timer;
+    try { return await Promise.race([Promise.resolve().then(work),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('cache-timeout')),1500);})]); }
+    catch(error){cacheDisabled=true;metrics.cacheFallback=error.message;return null;}
+    finally{clearTimeout(timer);}
+  }
+  async function openCache() {
+    if(cacheDisabled)return null;
+    return cachePromise ||= storage(()=>caches.open(cacheName));
+  }
+  const progress = new Map();
+  const panel = document.createElement('div');
+  panel.id = 'bobo-loading';
+  panel.style.cssText = 'position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;background:rgba(248,244,234,.55);color:#384b43;font:18px system-ui;text-align:center;padding:24px;';
+  const text = document.createElement('div');
+  const actions = document.createElement('div');
+  const card = document.createElement('div');
+  card.style.cssText = 'background:#f8f4ea;padding:28px;max-width:460px;border-radius:8px;box-shadow:0 4px 24px #384b4326';
+  const bar = document.createElement('progress'); bar.max = 100; bar.value = 0;
+  bar.style.cssText = 'width:100%;height:14px;margin-top:22px;accent-color:#66816a';
+  bar.setAttribute('aria-label','资源下载进度');
+  card.append(text, bar, actions); panel.append(card); document.body.append(panel);
+  function show(message) { window.BoboBoot?.handoff(); panel.style.display = 'flex'; text.textContent = message; actions.replaceChildren(); }
+  function hide() { panel.style.display = 'none'; }
+  // Safari on iPadOS 15 lacks WASM SIMD. Test the feature, not the device name.
+  function supportsSimd() {
+    try {
+      return WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,0,0,1,4,1,96,0,0,3,2,1,0,10,9,1,7,0,65,0,253,15,26,11]));
+    } catch (_) { return false; }
+  }
+  function phase(stage) {
+    if(metrics.firstScreenReady || metrics.startupError || actions.childElementCount)return;
+    if(metrics.startupPhase!==stage)metrics.phases.push({stage,ms:Math.round(performance.now())});
+    metrics.startupPhase=stage;
+    const complete=progress.size && [...progress.values()].every(p=>p.done===p.total);
+    if(!complete && stage!=='init')return;
+    const label={verify:'正在校验绘本资源…',decode:'正在解压绘本资源…',compile:'正在编译绘本引擎…',init:'正在准备封面与目录…'}[stage];
+    if(label){text.textContent=label+'\n资源下载已完成，请稍候。';text.style.whiteSpace='pre-line';}
+  }
+  function resources(entry){return [entry,...(entry.narration?[entry.narration]:[])];}
+  async function pageAvailable(entry){return (await Promise.all(resources(entry).map(available))).every(Boolean);}
+  async function prepareVoice(name,entry) {
+    if(!entry.narration || !window.BoboNativeAudio || BoboNativeAudio.hasVoice(name))return;
+    const response=await compressedResponse(entry.narration,'正在准备这一页的朗读…');
+    await BoboNativeAudio.prepareVoice(name,await response.arrayBuffer());
+  }
+  async function prepareMusic() {
+    const m=await manifest();if(!m.music || !window.BoboNativeAudio)return;
+    const response=await compressedResponse(m.music,'正在准备背景音乐…',null,true);
+    await BoboNativeAudio.prepareMusic(await response.arrayBuffer());
+    metrics.musicReady=true;
+  }
+  function fail(error) {
+    if (metrics.firstScreenReady) return;
+    clearTimeout(startupTimer);
+    const reason = error instanceof Error ? error.message : String(error || '未知启动错误');
+    metrics.startupError = reason;
+    show('绘本暂时未能打开\n' + reason + '\n请重新加载。旧设备建议使用系统可提供的最新 Safari。');
+    text.style.whiteSpace = 'pre-line'; bar.style.display = 'none';
+    const retry = document.createElement('button');
+    retry.textContent = '重新加载'; retry.style.cssText = 'margin-top:20px;padding:12px 24px;font:inherit';
+    retry.onclick = () => location.reload(); actions.append(retry);
+  }
+  async function prepareEngine() {
+    show('正在连接绘本资源目录…');
+    if(typeof WebAssembly!=='object' || typeof BigInt64Array!=='function' || typeof WebAssembly.Tag!=='function')throw Error('浏览器内核缺少 WebAssembly / BigInt / 异常处理能力。请更新浏览器；安卓可尝试最新版 Chrome，iPad 请使用更新后的 Safari。');
+    const testCanvas=document.createElement('canvas');
+    const gl=testCanvas.getContext('webgl2');
+    if(!gl)throw Error('浏览器无法启用 WebGL2。请关闭其他标签后重试；安卓可尝试最新版 Chrome，iPad 请使用 Safari。');
+    gl.getExtension('WEBGL_lose_context')?.loseContext();
+    const m = await retryable(manifest, '资源目录未能加载');
+    const simd = supportsSimd();
+    const compatible = !simd || new URLSearchParams(location.search).get('compat') === '1';
+    engineEntry = compatible ? m.engineCompat : m.engine;
+    if (!engineEntry) throw Error('此浏览器需要兼容引擎，但当前发布缺少该资源。');
+    metrics.simdSupported = simd;
+    metrics.engineVariant = compatible ? 'compat-no-simd' : (m.engine.simd===false?'standard-2d':'standard-simd');
+    metrics.lowEndMode=compatible;
+    metrics.renderPixelRatio=window.devicePixelRatio||1;
+    metrics.engineFile = engineEntry.file;
+    show(compatible ? '正在打开绘本，使用旧设备兼容模式…' : '正在打开绘本…');
+    // Fetch the large verified resources alongside the engine glue instead
+    // of adding another full network round trip before their download starts.
+    startResources();
+    const src = compatible ? 'index.compat.js' : 'index.js';
+    await new Promise((resolve,reject) => {
+      const script = document.createElement('script'); script.src = url(src) + '?v=' + version;
+      const timer = setTimeout(() => { script.remove(); reject(Error('引擎脚本下载超时，请检查网络后重试。')); }, 45000);
+      script.onload = () => { clearTimeout(timer); resolve(); };
+      script.onerror = () => { clearTimeout(timer); reject(Error('引擎脚本未能下载，请检查网络后重试。')); };
+      document.head.append(script);
+    });
+    window.addEventListener('error', event => { if (event.error) fail(event.error); });
+    window.addEventListener('unhandledrejection', event => fail(event.reason));
+    startupTimer = setTimeout(() => {
+      if (metrics.firstScreenReady || metrics.startupError || actions.childElementCount) return;
+      show('展开书页耗时较长，正在等待设备完成启动…\n若长时间没有变化，可以重新加载或关闭其他浏览器标签。');
+      text.style.whiteSpace = 'pre-line';
+      const retry = document.createElement('button'); retry.textContent = '重新加载';
+      retry.style.cssText = 'margin-top:20px;padding:12px 24px;font:inherit';
+      retry.onclick = () => location.reload(); actions.append(retry);
+    }, 180000);
+    return engineEntry;
+  }
+  function url(name) { return new URL(name, base).href; }
+  function notify() { metrics.downloadStates = states; statusCallback?.(JSON.stringify(states)); }
+  function state(name, status, ratio=0) { states[name]={status,ratio}; notify(); }
+  function cancelled(signal) { if(signal?.aborted) throw new DOMException('用户取消下载','AbortError'); }
+  async function available(entry) {
+    if(memoryCache.has(entry.file))return true;
+    const cache=await openCache();
+    return !!(cache && await storage(()=>cache.match(url(entry.file))));
+  }
+  async function refreshStates() {
+    const m=await manifest();
+    await Promise.all(Object.entries(m.animals).map(async ([name,entry])=>{
+      const found=await pageAvailable(entry);
+      if(states[name]?.status!=='downloading')state(name,found?'downloaded':'unloaded',found?1:0);
+    }));
+  }
+  function manifest() {
+    if (manifestPromise) return manifestPromise;
+    // The build embeds its matching manifest: no extra serial request or
+    // mixed old/new release while GitHub Pages caches are being refreshed.
+    if(window.BoboEmbeddedManifest?.version===version)return manifestPromise=Promise.resolve(window.BoboEmbeddedManifest);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(),45000);
+    return manifestPromise ||= nativeFetch(url('web-manifest.json') + '?v=' + version, {cache:'no-cache',signal:controller.signal})
+      .then(r => { if (!r.ok) throw Error('资源目录无法连接（HTTP ' + r.status + '）'); return r.json(); })
+      .catch(e => { manifestPromise = null; throw e; }).finally(() => clearTimeout(timeout));
+  }
+  function report(name, done, total, title) {
+    if (metrics.startupError) return;
+    if(resourceOwner?.mode==='single'){
+      progress.set(name,{done,total});
+      let d=0,t=0;for(const p of progress.values()){d+=p.done;t+=p.total;}
+      state(resourceOwner.name,'downloading',t?d/t:0);
+      if(metrics.page?.state==='catalog')return;
+    }
+    if(resourceOwner?.entry.file===name) {
+      const owner=resourceOwner; state(owner.name,'downloading',total?done/total:0);
+      owner.update?.(done);
+      if(owner.mode==='all' || metrics.page?.state==='catalog')return;
+    }
+    progress.set(name, {done, total});
+    let d = 0, t = 0; for (const p of progress.values()) { d += p.done; t += p.total; }
+    const mb = n => (n / 1048576).toFixed(1);
+    if (actions.childElementCount) return; // Another parallel download must not overwrite an error dialog.
+    text.textContent = title + '\n' + mb(d) + ' / ' + mb(t) + ' MB · ' + (t ? Math.floor(d / t * 100) : 0) + '%';
+    bar.value = t ? Math.floor(d / t * 100) : 0;
+    text.style.whiteSpace = 'pre-line';
+    if (t && d === t) text.textContent += '\n下载完成，正在校验资源…';
+  }
+  async function compressedResponse(entry, title, signal, quiet=false) {
+    cancelled(signal);
+    const address = url(entry.file);
+    let response;
+    // Read the verified in-memory result before waiting on any disk write.
+    if(memoryCache.has(entry.file))response=new Response(memoryCache.get(entry.file));
+    const cache=response?null:await openCache();
+    if(!response && cache)response=await storage(()=>cache.match(address));
+    if (response) { cancelled(signal);metrics.cacheHits++; if(!quiet)report(entry.file, entry.bytes, entry.bytes, title); return response; }
+    const controller = new AbortController();
+    const abort=()=>controller.abort(); signal?.addEventListener('abort',abort,{once:true});
+    let timer = setTimeout(() => controller.abort(), 45000);
+    try {
+      response = await nativeFetch(address, {signal:controller.signal, cache:'default'});
+      if (!response.ok) throw Error('资源下载失败（HTTP ' + response.status + '）');
+      clearTimeout(timer);
+      const reader = response.body.getReader();
+      const chunks = []; let received = 0;
+      while (true) {
+        timer = setTimeout(() => controller.abort(), 45000);
+        const part = await reader.read(); clearTimeout(timer);
+        if (part.done) break;
+        chunks.push(part.value); received += part.value.length;
+        if(!quiet)report(entry.file, received, entry.bytes, title);
+      }
+      if (received !== entry.bytes) throw Error('资源下载不完整，请重试');
+      const blob = new Blob(chunks, {type:entry.mime||'application/gzip'});
+      const bytes = await blob.arrayBuffer();
+      if(!quiet)phase('verify');
+      const digest = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), x => x.toString(16).padStart(2,'0')).join('');
+      if (digest !== entry.sha256) throw Error('资源校验失败，请重试');
+      cancelled(signal);
+      metrics.downloadedBytes += received;
+      response = new Response(blob, {headers:{'Content-Type':entry.mime||'application/gzip'}});
+      // Disk persistence must not hold up decoding/engine initialization.
+      memoryCache.set(entry.file,blob);
+      if(cache){const write=storage(async()=>{await cache.put(address,response.clone());return true;}).then(ok=>{if(ok)memoryCache.delete(entry.file);}).finally(()=>pendingWrites.delete(address));pendingWrites.set(address,write);}
+      cancelled(signal);
+      return response;
+    } finally { clearTimeout(timer);signal?.removeEventListener('abort',abort); }
+  }
+  async function decoded(entry, type, title, signal) {
+    const response = await compressedResponse(entry, title, signal);
+    phase('decode');
+    // Stream decompression; no 36-part concatenation / giant uncompressed JS array.
+    const headers = {'Content-Type':type,'Content-Length':String(entry.rawBytes)};
+    if (typeof DecompressionStream === 'function') return new Response(response.body.pipeThrough(new DecompressionStream('gzip')), {headers});
+    const input = await response.arrayBuffer();
+    const output = await new Promise((resolve,reject) => {
+      const worker = new Worker(url('bobo-gzip-worker.js'));
+      const timer = setTimeout(() => { worker.terminate(); reject(Error('资源解压超时，请重试')); }, 120000);
+      worker.onmessage = event => { clearTimeout(timer); worker.terminate(); event.data.error ? reject(Error(event.data.error)) : resolve(event.data.bytes); };
+      worker.onerror = event => { clearTimeout(timer); worker.terminate(); reject(Error(event.message)); };
+      worker.postMessage(input,[input]);
+    });
+    return new Response(output,{headers});
+  }
+  async function retryable(work, title) {
+    for (;;) {
+      try { return await work(); }
+      catch (error) {
+        show(title + '\n' + (error.name === 'AbortError' ? '连接超时，当前网络无法稳定下载 GitHub 资源。' : error.message) + '\n请检查网络后重试。切换网络不会丢失已缓存的完整文件。');
+        text.style.whiteSpace = 'pre-line';
+        await new Promise((resolve, reject) => {
+          const retry = document.createElement('button'); retry.textContent = '重新加载'; retry.style.cssText = 'margin:20px;padding:12px 24px;font:inherit'; retry.onclick = resolve;
+          const cancel = document.createElement('button'); cancel.textContent = '返回'; cancel.style.cssText = retry.style.cssText; cancel.onclick = () => reject(error);
+          actions.append(retry, cancel);
+        });
+        show(title);
+      }
+    }
+  }
+  function startResources() {
+    // Both Godot startup fetches share one retry flow. Separate dialogs would
+    // strand one promise if WASM and PCK fail together on an unstable network.
+    startupPromise ||= retryable(async () => {
+      const m = await manifest();
+      progress.clear();
+      const selectedEngine = engineEntry || m.engine;
+      for (const entry of [selectedEngine, m.core]) progress.set(entry.file, {done:0,total:entry.bytes});
+      const title=metrics.engineVariant==='compat-no-simd' ? '正在打开绘本，旧设备兼容模式，仅加载封面和目录…' : '正在打开绘本，仅加载封面和目录…'; show(title);
+      const [wasm,pck]=await Promise.all([decoded(selectedEngine,'application/wasm',title),decoded(m.core,'application/octet-stream',title)]);
+      phase('compile');
+      return {'index.wasm':wasm,'index.pck':pck};
+    }, '打开绘本失败').catch(error=>{startupPromise=null;throw error;});
+    // The glue can fail while prefetch is active; keep its promise handled.
+    startupPromise.catch(()=>{});
+    return startupPromise;
+  }
+  window.fetch = async (input, options) => {
+    const address = new URL(typeof input === 'string' ? input : input instanceof URL ? input.href : input.url, location.href);
+    const name = address.pathname.slice(base.pathname.length);
+    if (address.origin !== base.origin || !address.pathname.startsWith(base.pathname) || !['index.wasm','index.pck'].includes(name)) return nativeFetch(input, options);
+    startResources();
+    const responses=await startupPromise;
+    const response=responses[name];
+    delete responses[name]; // Do not keep an unread tee branch holding a full decompressed WASM/PCK.
+    if(response) return response;
+    const m=await manifest();
+    return decoded(name==='index.wasm'?(engineEntry || m.engine):m.core,name==='index.wasm'?'application/wasm':'application/octet-stream','正在打开绘本…');
+  };
+  window.BOBOWeb = {
+    metrics,
+    prepareEngine,
+    fail,
+    phase,
+    get lowEndMode(){return !!metrics.lowEndMode;},
+    qaEnabled: new URLSearchParams(location.search).get('qa') === '1',
+    installProbe(callback) { this.probeCallback = callback; },
+    probeData(json) { metrics.probe = JSON.parse(json); },
+    attach(instance) { engine = instance; },
+    ready() { clearTimeout(startupTimer); delete metrics.startupError; metrics.firstScreenReady = true; metrics.phases.push({stage:'ready',ms:Math.round(performance.now())}); hide(); refreshStates().catch(console.error); prepareMusic().catch(error=>{metrics.audioError=error.message;console.warn('BOBO_MUSIC_PENDING',error.message);}); console.info('BOBO_FIRST_SCREEN_READY', version, metrics.engineVariant, metrics.downloadedBytes); },
+    pageReady(info) { metrics.page = info; console.info('BOBO_PAGE_READY', JSON.stringify(info)); },
+    installStatusCallback(callback) {statusCallback=callback;notify();},
+    refreshStates() {refreshStates().catch(console.error);},
+    downloadAll() {
+      if(allTask || inFlight.size)return;
+      const task={controller:new AbortController()}; allTask=task;
+      metrics.allDownloadCompleted=false;
+      const ui=window.BoboDownloadUI;
+      const signal=task.controller.signal;
+      let waitingReject;
+      const cancel=()=>{task.controller.abort();waitingReject?.(new DOMException('用户取消下载','AbortError'));ui.close();};
+      ui.begin(cancel);
+      (async()=>{
+        const m=await manifest();cancelled(signal);
+        const entries=Object.entries(m.animals),total=entries.reduce((sum,[,e])=>sum+resources(e).reduce((n,r)=>n+r.bytes,0),0);
+        let count=0,done=0;
+        // Count actual cached files first, not visited pages or localStorage flags.
+        const pending=[];
+        for(const [name,entry] of entries){
+          cancelled(signal);
+          if(await pageAvailable(entry)){done+=resources(entry).reduce((n,r)=>n+r.bytes,0);count++;state(name,'downloaded',1);}
+          else pending.push([name,entry]);
+        }
+        ui.progress(done/total,count,entries.length,'');
+        for(const [name,entry] of pending){
+          cancelled(signal);
+          const size=resources(entry).reduce((n,r)=>n+r.bytes,0);
+          let partDone=0;
+          for(;;){
+            state(name,'downloading',0);
+            resourceOwner={mode:'all',name,entry,update:n=>ui.progress((done+partDone+n)/total,count,entries.length,name)};
+            ui.progress(done/total,count,entries.length,name);
+            try{
+              partDone=0;
+              for(const asset of resources(entry)){
+                resourceOwner.entry=asset;
+                await compressedResponse(asset,'正在下载全课程',signal);
+                partDone+=asset.bytes;
+              }
+              break;
+            }
+            catch(error){
+              if(signal.aborted)throw error;
+              await new Promise((resolve,reject)=>{waitingReject=reject;ui.error(error.name==='AbortError'?'连接暂时中断，可以继续下载。':error.message,resolve);}).finally(()=>waitingReject=null);
+              cancelled(signal);
+            }
+          }
+          done+=size;count++;state(name,'downloaded',1);ui.progress(done/total,count,entries.length,name);
+        }
+        cancelled(signal);metrics.allDownloadCompleted=true;ui.success();
+      })().catch(error=>{
+        if(!signal.aborted){console.error(error);ui.close();}
+      }).finally(async()=>{
+        if(allTask===task){allTask=null;resourceOwner=null;await refreshStates().catch(console.error);}
+      });
+    },
+    loadAnimal(name, callback) {
+      if(allTask){callback(false,'');return;}
+      if (mounted.has(name) && (!window.BoboNativeAudio || BoboNativeAudio.hasVoice(name))) { callback(true, mounted.get(name)); return; }
+      if (inFlight.has(name)) { inFlight.get(name).then(path => callback(true,path), () => callback(false,'')); return; }
+      const promise = retryable(async () => {
+        const m = await manifest(); const entry = m.animals[name];
+        if (!entry) throw Error('没有对应的动物资源');
+        resourceOwner={mode:'single',name,entry};state(name,'downloading',0);
+        progress.clear(); for(const asset of resources(entry))progress.set(asset.file, {done:0,total:asset.bytes});
+        if(metrics.page?.state!=='catalog')show('正在翻到' + name + '这一页…');
+        let path=mounted.get(name);
+        if(!path){
+          const response = await decoded(entry, 'application/octet-stream', '正在翻到' + name + '这一页…');
+          const buffer = new Uint8Array(await response.arrayBuffer());
+          if (buffer.byteLength !== entry.rawBytes) throw Error('解压后的资源不完整');
+          path = '/bobo-' + entry.id + '.pck';
+          engine.copyToFS(path, buffer);
+        }else report(entry.file,entry.bytes,entry.bytes,'正在准备这一页的朗读…');
+        await prepareVoice(name,entry);
+        mounted.set(name, path); metrics.animals.push(name);
+        state(name,'downloaded',1);
+        console.info('BOBO_ANIMAL_DOWNLOADED', name, entry.bytes);
+        return path;
+      }, '这一页未能加载');
+      inFlight.set(name, promise);
+      promise.then(path => { hide(); callback(true,path); }, error => { console.error(error); hide(); callback(false,''); }).finally(() => {inFlight.delete(name);resourceOwner=null;refreshStates().catch(console.error);});
+    },
+  };
+})();
+</script>
+<script>/* Long audio is scheduled by the browser, never supplied by Godot's frame loop.
+ * Original user MP3s are unchanged. Only the current voice buffer is retained.
+ */
+(() => {
+  'use strict';
+  let context, musicBuffer, voiceBuffer, musicSource, voiceSource;
+  let musicWanted = false, voiceWanted = false, voicePaused = false, voiceFinished = false;
+  let voiceName = '', offset = 0, started = 0, generation = 0, musicGain = .3;
+  let musicNode, voiceNode;
+  const metrics = {backend:'browser-buffer', voiceName:'', voiceBuffers:0, musicBuffers:0};
+  function init() {
+    if (context) return context;
+    const Type = window.AudioContext || window.webkitAudioContext;
+    if (!Type) throw Error('此浏览器不支持声音播放，请使用系统 Safari。');
+    try {context = new Type({sampleRate:32000,latencyHint:'playback'});} catch (_) {context = new Type();}
+    metrics.sampleRate=context.sampleRate;
+    musicNode = context.createGain(); musicNode.gain.value = musicGain; musicNode.connect(context.destination);
+    voiceNode = context.createGain(); voiceNode.gain.value = Math.pow(10,-3/20); voiceNode.connect(context.destination);
+    return context;
+  }
+  function haltVoice() {
+    if (!voiceSource) return;
+    const source=voiceSource; voiceSource=null; source.onended=null;
+    try {source.stop();} catch (_) {} source.disconnect();
+  }
+  function runVoice() {
+    if (!voiceWanted || voicePaused || !voiceBuffer || voiceSource) return;
+    init();
+    if (offset >= voiceBuffer.duration) offset=0;
+    const source=context.createBufferSource(); source.buffer=voiceBuffer; source.connect(voiceNode);
+    voiceSource=source; started=context.currentTime;
+    source.onended=()=>{
+      if (voiceSource !== source) return;
+      voiceSource=null; source.disconnect(); offset=0;
+      voiceWanted=false; voicePaused=false; voiceFinished=true;
+    };
+    source.start(0,offset);
+  }
+  function runMusic() {
+    if (!musicWanted || !musicBuffer || musicSource) return;
+    init(); const source=context.createBufferSource(); source.buffer=musicBuffer;
+    source.loop=true; source.connect(musicNode); source.start(); musicSource=source;
+    metrics.musicStartedAt=context.currentTime;
+  }
+  function unlock() {
+    if (!context) return;
+    context.resume().catch(()=>{}); runMusic(); runVoice();
+  }
+  // iOS requires a gesture. Do not claim automatic audible playback before it.
+  for (const type of ['pointerdown','touchend','keydown']) document.addEventListener(type,unlock,{capture:true,passive:true});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)unlock();});
+  window.BoboNativeAudio = {
+    metrics,
+    async prepareMusic(bytes) {
+      init(); musicBuffer=await context.decodeAudioData(bytes); metrics.musicBuffers=1; runMusic();
+    },
+    async prepareVoice(name,bytes) {
+      if (name===voiceName && voiceBuffer) return;
+      const ticket=++generation; init();
+      const buffer=await context.decodeAudioData(bytes);
+      if(ticket!==generation)return;
+      haltVoice(); voiceWanted=false; voicePaused=false; voiceFinished=false; offset=0;
+      voiceBuffer=buffer; voiceName=name; metrics.voiceName=name; metrics.voiceBuffers=1;
+    },
+    hasVoice(name) {return name===voiceName && !!voiceBuffer;},
+    playVoice(name) {
+      if(name!==voiceName || !voiceBuffer)return false;
+      haltVoice(); offset=0; voiceWanted=true; voicePaused=false; voiceFinished=false;
+      unlock(); return true;
+    },
+    setVoicePaused(paused) {
+      if(voicePaused===paused)return;
+      if(paused && voiceSource) offset=Math.min(voiceBuffer.duration,offset+context.currentTime-started);
+      voicePaused=paused; if(paused)haltVoice();else runVoice();
+    },
+    stopVoice() {haltVoice();offset=0;voiceWanted=false;voicePaused=false;voiceFinished=false;},
+    isVoiceFinished() {return voiceFinished;},
+    playMusic() {musicWanted=true; init(); unlock();return true;},
+    stopMusic() {musicWanted=false;if(musicSource){musicSource.stop();musicSource.disconnect();musicSource=null;}},
+    setMusicGain(value) {
+      musicGain=Math.max(0,Math.min(1,value)); if(!context)return;
+      const now=context.currentTime; const gain=musicNode.gain;
+      gain.cancelScheduledValues(now); gain.setValueAtTime(gain.value,now); gain.linearRampToValueAtTime(musicGain,now+.08);
+    },
+    status() {
+      return {backend:metrics.backend,context:context?.state||'uninitialized',
+        voice:{name:voiceName,playing:!!voiceSource,paused:voicePaused,finished:voiceFinished,
+          position:offset+(voiceSource?context.currentTime-started:0),seconds:voiceBuffer?.duration||0},
+        music:{playing:!!musicSource,position:musicSource?(context.currentTime-metrics.musicStartedAt)%musicBuffer.duration:0,gain:musicGain},
+        buffers:{voice:metrics.voiceBuffers,music:metrics.musicBuffers}};
+    },
+  };
+})();
+</script>
 		<script>
 (async function () {
+if(window.BoboBoot && !window.BoboBoot.supported)return;
 const selectedEngine = await BOBOWeb.prepareEngine();
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":1125112,"index.wasm":27634060},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":1126720,"index.wasm":27634060},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 GODOT_CONFIG.fileSizes['index.wasm']=selectedEngine.rawBytes;
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
@@ -222,7 +818,7 @@ window.BOBOWeb.attach(engine);
 		}, displayFailureNotice);
 	}
 }());
-}()).catch(error => window.BOBOWeb.fail(error));
+}()).catch(error => window.BOBOWeb ? window.BOBOWeb.fail(error) : window.BoboBoot.fail(String(error)));
 		</script>
 	</body>
 </html>
