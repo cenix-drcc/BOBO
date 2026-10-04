@@ -3,7 +3,7 @@
   'use strict';
   const nativeFetch = window.fetch.bind(window);
   const base = new URL('.', document.currentScript.src);
-  const version = 'mini4-compat-v7-20261003';
+  const version = 'light-audio-v8-20261004';
   const cacheName = 'bobo-web-resources-v2';
   let manifestPromise;
   let startupPromise;
@@ -15,7 +15,8 @@
   const memoryCache = new Map(); // Only used when persistent storage is unavailable.
   const states = {};
   let statusCallback, allTask, resourceOwner;
-  const metrics = {version, downloadedBytes: 0, cacheHits: 0, animals: []};
+  const metrics = {version, downloadedBytes: 0, cacheHits: 0, animals: [], phases: []};
+  const pendingWrites = new Map();
   const progress = new Map();
   const panel = document.createElement('div');
   panel.id = 'bobo-loading';
@@ -36,6 +37,28 @@
       return WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,0,0,1,4,1,96,0,0,3,2,1,0,10,9,1,7,0,65,0,253,15,26,11]));
     } catch (_) { return false; }
   }
+  function phase(stage) {
+    if(metrics.firstScreenReady || metrics.startupError)return;
+    if(metrics.startupPhase!==stage)metrics.phases.push({stage,ms:Math.round(performance.now())});
+    metrics.startupPhase=stage;
+    const complete=progress.size && [...progress.values()].every(p=>p.done===p.total);
+    if(!complete && stage!=='init')return;
+    const label={verify:'正在校验绘本资源…',decode:'正在解压绘本资源…',compile:'正在编译绘本引擎…',init:'正在准备封面与目录…'}[stage];
+    if(label){text.textContent=label+'\n资源下载已完成，请稍候。';text.style.whiteSpace='pre-line';}
+  }
+  function resources(entry){return [entry,...(entry.narration?[entry.narration]:[])];}
+  async function pageAvailable(entry){return (await Promise.all(resources(entry).map(available))).every(Boolean);}
+  async function prepareVoice(name,entry) {
+    if(!entry.narration || !window.BoboNativeAudio || BoboNativeAudio.hasVoice(name))return;
+    const response=await compressedResponse(entry.narration,'正在准备这一页的朗读…');
+    await BoboNativeAudio.prepareVoice(name,await response.arrayBuffer());
+  }
+  async function prepareMusic() {
+    const m=await manifest();if(!m.music || !window.BoboNativeAudio)return;
+    const response=await compressedResponse(m.music,'正在准备背景音乐…',null,true);
+    await BoboNativeAudio.prepareMusic(await response.arrayBuffer());
+    metrics.musicReady=true;
+  }
   function fail(error) {
     if (metrics.firstScreenReady) return;
     clearTimeout(startupTimer);
@@ -48,13 +71,20 @@
     retry.onclick = () => location.reload(); actions.append(retry);
   }
   async function prepareEngine() {
+    if(typeof WebAssembly!=='object' || typeof BigInt64Array!=='function')throw Error('此浏览器版本过旧，缺少绘本引擎所需能力。请更新系统或使用 Safari。');
+    const testCanvas=document.createElement('canvas');
+    const gl=testCanvas.getContext('webgl2');
+    if(!gl)throw Error('此浏览器无法启用 WebGL2。请关闭其他标签后使用 Safari 重试。');
+    gl.getExtension('WEBGL_lose_context')?.loseContext();
     const m = await retryable(manifest, '资源目录未能加载');
     const simd = supportsSimd();
     const compatible = !simd || new URLSearchParams(location.search).get('compat') === '1';
     engineEntry = compatible ? m.engineCompat : m.engine;
     if (!engineEntry) throw Error('此浏览器需要兼容引擎，但当前发布缺少该资源。');
     metrics.simdSupported = simd;
-    metrics.engineVariant = compatible ? 'compat-no-simd' : 'standard-simd';
+    metrics.engineVariant = compatible ? 'compat-no-simd' : (m.engine.simd===false?'standard-2d':'standard-simd');
+    metrics.lowEndMode=compatible;
+    metrics.renderPixelRatio=window.devicePixelRatio||1;
     metrics.engineFile = engineEntry.file;
     show(compatible ? '正在打开绘本，使用旧设备兼容模式…' : '正在打开绘本…');
     const src = compatible ? 'index.compat.js' : 'index.js';
@@ -88,7 +118,7 @@
   async function refreshStates() {
     const m=await manifest();
     await Promise.all(Object.entries(m.animals).map(async ([name,entry])=>{
-      const found=mounted.has(name)||await available(entry);
+      const found=await pageAvailable(entry);
       if(states[name]?.status!=='downloading')state(name,found?'downloaded':'unloaded',found?1:0);
     }));
   }
@@ -102,6 +132,12 @@
   }
   function report(name, done, total, title) {
     if (metrics.startupError) return;
+    if(resourceOwner?.mode==='single'){
+      progress.set(name,{done,total});
+      let d=0,t=0;for(const p of progress.values()){d+=p.done;t+=p.total;}
+      state(resourceOwner.name,'downloading',t?d/t:0);
+      if(metrics.page?.state==='catalog')return;
+    }
     if(resourceOwner?.entry.file===name) {
       const owner=resourceOwner; state(owner.name,'downloading',total?done/total:0);
       owner.update?.(done);
@@ -114,17 +150,18 @@
     text.textContent = title + '\n' + mb(d) + ' / ' + mb(t) + ' MB · ' + (t ? Math.floor(d / t * 100) : 0) + '%';
     bar.value = t ? Math.floor(d / t * 100) : 0;
     text.style.whiteSpace = 'pre-line';
-    if (t && d === t) text.textContent += '\n下载完成，正在展开书页…';
+    if (t && d === t) text.textContent += '\n下载完成，正在校验资源…';
   }
-  async function compressedResponse(entry, title, signal) {
+  async function compressedResponse(entry, title, signal, quiet=false) {
     cancelled(signal);
     let cache;
     try { cache = await caches.open(cacheName); } catch (_) { /* Private browsing / quota: network fallback. */ }
     const address = url(entry.file);
     let response;
+    if(pendingWrites.has(address))await pendingWrites.get(address);
     try { response = cache && await cache.match(address); } catch (_) {}
     if(!response && memoryCache.has(entry.file))response=new Response(memoryCache.get(entry.file));
-    if (response) { cancelled(signal);metrics.cacheHits++; report(entry.file, entry.bytes, entry.bytes, title); return response; }
+    if (response) { cancelled(signal);metrics.cacheHits++; if(!quiet)report(entry.file, entry.bytes, entry.bytes, title); return response; }
     const controller = new AbortController();
     const abort=()=>controller.abort(); signal?.addEventListener('abort',abort,{once:true});
     let timer = setTimeout(() => controller.abort(), 45000);
@@ -139,25 +176,27 @@
         const part = await reader.read(); clearTimeout(timer);
         if (part.done) break;
         chunks.push(part.value); received += part.value.length;
-        report(entry.file, received, entry.bytes, title);
+        if(!quiet)report(entry.file, received, entry.bytes, title);
       }
       if (received !== entry.bytes) throw Error('资源下载不完整，请重试');
-      const blob = new Blob(chunks, {type:'application/gzip'});
+      const blob = new Blob(chunks, {type:entry.mime||'application/gzip'});
       const bytes = await blob.arrayBuffer();
+      if(!quiet)phase('verify');
       const digest = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), x => x.toString(16).padStart(2,'0')).join('');
       if (digest !== entry.sha256) throw Error('资源校验失败，请重试');
       cancelled(signal);
       metrics.downloadedBytes += received;
-      response = new Response(blob, {headers:{'Content-Type':'application/gzip'}});
-      let persisted=false;
-      try { if (cache) {await cache.put(address, response.clone());persisted=true;} } catch (_) {}
-      if(!persisted)memoryCache.set(entry.file,blob);
+      response = new Response(blob, {headers:{'Content-Type':entry.mime||'application/gzip'}});
+      // Disk persistence must not hold up decoding/engine initialization.
+      memoryCache.set(entry.file,blob);
+      if(cache){const write=cache.put(address,response.clone()).then(()=>memoryCache.delete(entry.file)).catch(()=>{}).finally(()=>pendingWrites.delete(address));pendingWrites.set(address,write);}
       cancelled(signal);
       return response;
     } finally { clearTimeout(timer);signal?.removeEventListener('abort',abort); }
   }
   async function decoded(entry, type, title, signal) {
     const response = await compressedResponse(entry, title, signal);
+    phase('decode');
     // Stream decompression; no 36-part concatenation / giant uncompressed JS array.
     const headers = {'Content-Type':type,'Content-Length':String(entry.rawBytes)};
     if (typeof DecompressionStream === 'function') return new Response(response.body.pipeThrough(new DecompressionStream('gzip')), {headers});
@@ -199,6 +238,7 @@
       for (const entry of [selectedEngine, m.core]) progress.set(entry.file, {done:0,total:entry.bytes});
       const title=metrics.engineVariant==='compat-no-simd' ? '正在打开绘本，旧设备兼容模式，仅加载封面和目录…' : '正在打开绘本，仅加载封面和目录…'; show(title);
       const [wasm,pck]=await Promise.all([decoded(selectedEngine,'application/wasm',title),decoded(m.core,'application/octet-stream',title)]);
+      phase('compile');
       return {'index.wasm':wasm,'index.pck':pck};
     }, '打开绘本失败').catch(error=>{startupPromise=null;throw error;});
     const responses=await startupPromise;
@@ -212,11 +252,13 @@
     metrics,
     prepareEngine,
     fail,
+    phase,
+    get lowEndMode(){return !!metrics.lowEndMode;},
     qaEnabled: new URLSearchParams(location.search).get('qa') === '1',
     installProbe(callback) { this.probeCallback = callback; },
     probeData(json) { metrics.probe = JSON.parse(json); },
     attach(instance) { engine = instance; },
-    ready() { clearTimeout(startupTimer); delete metrics.startupError; metrics.firstScreenReady = true; hide(); refreshStates().catch(console.error); console.info('BOBO_FIRST_SCREEN_READY', version, metrics.engineVariant, metrics.downloadedBytes); },
+    ready() { clearTimeout(startupTimer); delete metrics.startupError; metrics.firstScreenReady = true; metrics.phases.push({stage:'ready',ms:Math.round(performance.now())}); hide(); refreshStates().catch(console.error); prepareMusic().catch(error=>{metrics.audioError=error.message;console.warn('BOBO_MUSIC_PENDING',error.message);}); console.info('BOBO_FIRST_SCREEN_READY', version, metrics.engineVariant, metrics.downloadedBytes); },
     pageReady(info) { metrics.page = info; console.info('BOBO_PAGE_READY', JSON.stringify(info)); },
     installStatusCallback(callback) {statusCallback=callback;notify();},
     refreshStates() {refreshStates().catch(console.error);},
@@ -231,30 +273,40 @@
       ui.begin(cancel);
       (async()=>{
         const m=await manifest();cancelled(signal);
-        const entries=Object.entries(m.animals),total=entries.reduce((sum,[,e])=>sum+e.bytes,0);
+        const entries=Object.entries(m.animals),total=entries.reduce((sum,[,e])=>sum+resources(e).reduce((n,r)=>n+r.bytes,0),0);
         let count=0,done=0;
         // Count actual cached files first, not visited pages or localStorage flags.
         const pending=[];
         for(const [name,entry] of entries){
           cancelled(signal);
-          if(await available(entry)){done+=entry.bytes;count++;state(name,'downloaded',1);}
+          if(await pageAvailable(entry)){done+=resources(entry).reduce((n,r)=>n+r.bytes,0);count++;state(name,'downloaded',1);}
           else pending.push([name,entry]);
         }
         ui.progress(done/total,count,entries.length,'');
         for(const [name,entry] of pending){
           cancelled(signal);
+          const size=resources(entry).reduce((n,r)=>n+r.bytes,0);
+          let partDone=0;
           for(;;){
             state(name,'downloading',0);
-            resourceOwner={mode:'all',name,entry,update:n=>ui.progress((done+n)/total,count,entries.length,name)};
+            resourceOwner={mode:'all',name,entry,update:n=>ui.progress((done+partDone+n)/total,count,entries.length,name)};
             ui.progress(done/total,count,entries.length,name);
-            try{await compressedResponse(entry,'正在下载全课程',signal);break;}
+            try{
+              partDone=0;
+              for(const asset of resources(entry)){
+                resourceOwner.entry=asset;
+                await compressedResponse(asset,'正在下载全课程',signal);
+                partDone+=asset.bytes;
+              }
+              break;
+            }
             catch(error){
               if(signal.aborted)throw error;
               await new Promise((resolve,reject)=>{waitingReject=reject;ui.error(error.name==='AbortError'?'连接暂时中断，可以继续下载。':error.message,resolve);}).finally(()=>waitingReject=null);
               cancelled(signal);
             }
           }
-          done+=entry.bytes;count++;state(name,'downloaded',1);ui.progress(done/total,count,entries.length,name);
+          done+=size;count++;state(name,'downloaded',1);ui.progress(done/total,count,entries.length,name);
         }
         cancelled(signal);metrics.allDownloadCompleted=true;ui.success();
       })().catch(error=>{
@@ -265,19 +317,23 @@
     },
     loadAnimal(name, callback) {
       if(allTask){callback(false,'');return;}
-      if (mounted.has(name)) { callback(true, mounted.get(name)); return; }
+      if (mounted.has(name) && (!window.BoboNativeAudio || BoboNativeAudio.hasVoice(name))) { callback(true, mounted.get(name)); return; }
       if (inFlight.has(name)) { inFlight.get(name).then(path => callback(true,path), () => callback(false,'')); return; }
       const promise = retryable(async () => {
         const m = await manifest(); const entry = m.animals[name];
         if (!entry) throw Error('没有对应的动物资源');
         resourceOwner={mode:'single',name,entry};state(name,'downloading',0);
-        progress.clear(); progress.set(entry.file, {done:0,total:entry.bytes});
+        progress.clear(); for(const asset of resources(entry))progress.set(asset.file, {done:0,total:asset.bytes});
         if(metrics.page?.state!=='catalog')show('正在翻到' + name + '这一页…');
-        const response = await decoded(entry, 'application/octet-stream', '正在翻到' + name + '这一页…');
-        const buffer = new Uint8Array(await response.arrayBuffer());
-        if (buffer.byteLength !== entry.rawBytes) throw Error('解压后的资源不完整');
-        const path = '/bobo-' + entry.id + '.pck';
-        engine.copyToFS(path, buffer);
+        let path=mounted.get(name);
+        if(!path){
+          const response = await decoded(entry, 'application/octet-stream', '正在翻到' + name + '这一页…');
+          const buffer = new Uint8Array(await response.arrayBuffer());
+          if (buffer.byteLength !== entry.rawBytes) throw Error('解压后的资源不完整');
+          path = '/bobo-' + entry.id + '.pck';
+          engine.copyToFS(path, buffer);
+        }else report(entry.file,entry.bytes,entry.bytes,'正在准备这一页的朗读…');
+        await prepareVoice(name,entry);
         mounted.set(name, path); metrics.animals.push(name);
         state(name,'downloaded',1);
         console.info('BOBO_ANIMAL_DOWNLOADED', name, entry.bytes);

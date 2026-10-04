@@ -21,7 +21,7 @@
   document.body.append(root);
   const find = s => root.querySelector(s), paper=find('.bobo-download-paper'), success=find('.bobo-download-success');
   find('.bobo-family').src = new URL('download-family-v1.webp',base);
-  const sprite=find('.bobo-mini-elephant'); sprite.style.backgroundImage=`url("${new URL('download-elephant-v1.webp',base)}")`;
+  const sprite=find('.bobo-mini-elephant'); sprite.style.backgroundImage=`url("${new URL('download-elephant-v3.webp',base)}")`;
   let frame=0, previousFocus, handlers={}, ticker;
   const positions=['0% 0%','50% 0%','100% 0%','0% 100%','50% 100%','100% 100%'];
   function stop() {clearInterval(ticker);ticker=null;sprite.classList.remove('running');}

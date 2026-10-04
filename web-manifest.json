@@ -1,16 +1,20 @@
 {
-  "version": "mini4-compat-v7-20261003",
+  "version": "light-audio-v8-20261004",
   "engine": {
-    "file": "engine-a1a6d45d7036.wasm.gz",
-    "bytes": 10054758,
-    "rawBytes": 39514754,
-    "sha256": "a1a6d45d70363dcf625dfe3cc3e860358292574d5394411f9747d3aafb30030f"
+    "file": "engine-fbeeda862033.wasm.gz",
+    "bytes": 6828500,
+    "rawBytes": 27634060,
+    "sha256": "fbeeda862033eb7732aa9ddce929e6b6baabb31e99c35a9b5113a72287686f6c",
+    "simd": false,
+    "threads": false,
+    "godotVersion": "4.7.2",
+    "profile": "bobo-2d"
   },
   "core": {
-    "file": "core-daa93be7f62e.pck.gz",
-    "bytes": 2380125,
-    "rawBytes": 2438556,
-    "sha256": "daa93be7f62ef738026987c024932b5ff5030ac5cac789519795d79cd99a6d5b"
+    "file": "core-da6736c6dd40.pck.gz",
+    "bytes": 1075708,
+    "rawBytes": 1125112,
+    "sha256": "da6736c6dd401cb097aa93e984f769655146add6511cb6e8a8610ce4d7aa173b"
   },
   "animals": {
     "非洲象": {
@@ -18,140 +22,260 @@
       "bytes": 1373352,
       "rawBytes": 1388396,
       "sha256": "c241f1a4ddd89993966cac95363498e86df744e3a058bc34032936e0f0840c3b",
-      "id": "african_elephant"
+      "id": "african_elephant",
+      "narration": {
+        "file": "narration-african_elephant-aa5e49505641.mp3",
+        "bytes": 149328,
+        "sha256": "aa5e4950564181b1a81c24bde99f002ba858b9cea2f732f84a530f8aabde8cec",
+        "mime": "audio/mpeg"
+      }
     },
     "长颈鹿": {
       "file": "giraffe-3c7855bad01f.pck.gz",
       "bytes": 1016291,
       "rawBytes": 1028872,
       "sha256": "3c7855bad01f2f0fce86cd03e4baaa2df911955be0ff9a574179c7a722b97380",
-      "id": "giraffe"
+      "id": "giraffe",
+      "narration": {
+        "file": "narration-giraffe-cc39fd9a18f0.mp3",
+        "bytes": 117648,
+        "sha256": "cc39fd9a18f071967f9c7a8f356e05a8b01d5bbe5653b1c4502bdb9effb23ea7",
+        "mime": "audio/mpeg"
+      }
     },
     "狮子": {
       "file": "lion-e94495e2abd7.pck.gz",
       "bytes": 2199630,
       "rawBytes": 2220112,
       "sha256": "e94495e2abd73ed5884b42f90895f2d3853df1617711d58c8afd0897324f070b",
-      "id": "lion"
+      "id": "lion",
+      "narration": {
+        "file": "narration-lion-03353ed294f5.mp3",
+        "bytes": 120960,
+        "sha256": "03353ed294f5a4648149e7a94891ac746ed6d4cefd91077812455e9c5a16991c",
+        "mime": "audio/mpeg"
+      }
     },
     "平原斑马": {
       "file": "plains_zebra-c96e8ca24869.pck.gz",
       "bytes": 1657436,
       "rawBytes": 1676296,
       "sha256": "c96e8ca248699b6d6f0f918b5b86e6440a397b19633f7e94b77f8873101b8979",
-      "id": "plains_zebra"
+      "id": "plains_zebra",
+      "narration": {
+        "file": "narration-plains_zebra-cb7dc9709eb4.mp3",
+        "bytes": 111888,
+        "sha256": "cb7dc9709eb4504a58acbd111bf0973060573e47d8017a7796f9b4aa40d76ce2",
+        "mime": "audio/mpeg"
+      }
     },
     "大熊猫": {
       "file": "giant_panda-3e15ed199bc5.pck.gz",
       "bytes": 932434,
       "rawBytes": 961328,
       "sha256": "3e15ed199bc5cb6fa4a0890fad2bb6770833fdaf0626b531badb727358bff497",
-      "id": "giant_panda"
+      "id": "giant_panda",
+      "narration": {
+        "file": "narration-giant_panda-a586dd1eefc6.mp3",
+        "bytes": 129168,
+        "sha256": "a586dd1eefc6f0b0470ff3b3a0e9dfd6dc88cd22e75581cc449be0fd10d1707c",
+        "mime": "audio/mpeg"
+      }
     },
     "棕熊": {
       "file": "brown_bear-46d080d68ac6.pck.gz",
       "bytes": 1004434,
       "rawBytes": 1020968,
       "sha256": "46d080d68ac65f25fffa60ad1f67f0a7dc3c01b02d4e120a4f82990cc54bd539",
-      "id": "brown_bear"
+      "id": "brown_bear",
+      "narration": {
+        "file": "narration-brown_bear-74b3fd5e20a7.mp3",
+        "bytes": 129024,
+        "sha256": "74b3fd5e20a7f7f5389dcda0efa3deec6588e97c7b2d58cfb751976a0a93e2d9",
+        "mime": "audio/mpeg"
+      }
     },
     "红狐狸": {
       "file": "red_fox-c3a514291b41.pck.gz",
       "bytes": 945760,
       "rawBytes": 959808,
       "sha256": "c3a514291b41d3ae5214689cc7f95c5c0b9fd02d8fe5eb4a6d03b20fd8b1822f",
-      "id": "red_fox"
+      "id": "red_fox",
+      "narration": {
+        "file": "narration-red_fox-1a91ab4534ee.mp3",
+        "bytes": 123264,
+        "sha256": "1a91ab4534ee3e8f8f2ccd38aa4836a9c68b3a7c059d1e69bb71e23e0e3d1564",
+        "mime": "audio/mpeg"
+      }
     },
     "梅花鹿": {
       "file": "sika_deer-4ab0ec9bd006.pck.gz",
       "bytes": 945830,
       "rawBytes": 958316,
       "sha256": "4ab0ec9bd006702a3fa56e3f2523ab357bf60430b28d26f7ff04dba2838cb814",
-      "id": "sika_deer"
+      "id": "sika_deer",
+      "narration": {
+        "file": "narration-sika_deer-2874d6305a1d.mp3",
+        "bytes": 123408,
+        "sha256": "2874d6305a1d97c970a85252a2705391649af5b2fea86c793d8fda2aed901e2c",
+        "mime": "audio/mpeg"
+      }
     },
     "北极熊": {
       "file": "polar_bear-a0a767acec7f.pck.gz",
       "bytes": 1092774,
       "rawBytes": 1111152,
       "sha256": "a0a767acec7f4b3cbfd379b1ceacbbebe9a6035fb7f69d9a00484f42c715d897",
-      "id": "polar_bear"
+      "id": "polar_bear",
+      "narration": {
+        "file": "narration-polar_bear-a8ed6a355081.mp3",
+        "bytes": 125712,
+        "sha256": "a8ed6a355081f8cda3bf60b0c589b0827555e7700e5235ea643a3496014c91e4",
+        "mime": "audio/mpeg"
+      }
     },
     "帝企鹅": {
       "file": "emperor_penguin-5f65d49fdad0.pck.gz",
       "bytes": 516185,
       "rawBytes": 531432,
       "sha256": "5f65d49fdad0471bc28972d8ddb58410bbdb559148f6ad03954bede888e638be",
-      "id": "emperor_penguin"
+      "id": "emperor_penguin",
+      "narration": {
+        "file": "narration-emperor_penguin-505dcefbcab9.mp3",
+        "bytes": 128448,
+        "sha256": "505dcefbcab99c56e66d04ddeefcd53741e547e5cf8e9647e93239852031c49c",
+        "mime": "audio/mpeg"
+      }
     },
     "竖琴海豹": {
       "file": "harp_seal-401f8b675f4c.pck.gz",
       "bytes": 960836,
       "rawBytes": 980292,
       "sha256": "401f8b675f4cebf76f8295a6db25c32ed3d8dacf0ee9b303d6c803205675ad83",
-      "id": "harp_seal"
+      "id": "harp_seal",
+      "narration": {
+        "file": "narration-harp_seal-aa6240308a39.mp3",
+        "bytes": 129888,
+        "sha256": "aa6240308a39ac4dde4b67f7db1a5e49ba736a1af576f162931c3d5f3b98d454",
+        "mime": "audio/mpeg"
+      }
     },
     "宽吻海豚": {
       "file": "bottlenose_dolphin-84e1c63ffc05.pck.gz",
       "bytes": 508728,
       "rawBytes": 520932,
       "sha256": "84e1c63ffc0579a114a156d8df97359a8d6dbbecd6c72beab7fd019bf099d8bd",
-      "id": "bottlenose_dolphin"
+      "id": "bottlenose_dolphin",
+      "narration": {
+        "file": "narration-bottlenose_dolphin-f8c4b0f13048.mp3",
+        "bytes": 120528,
+        "sha256": "f8c4b0f13048d7c17a0d9a5567ec0ba176f245f8edc7c075b47dd1b2d15f1e7f",
+        "mime": "audio/mpeg"
+      }
     },
     "绿海龟": {
       "file": "green_sea_turtle-25189ef2de15.pck.gz",
       "bytes": 664508,
       "rawBytes": 679028,
       "sha256": "25189ef2de15ceb02ab640d3b4ef7c73b2a034a3abe43bb120d2a9d384218303",
-      "id": "green_sea_turtle"
+      "id": "green_sea_turtle",
+      "narration": {
+        "file": "narration-green_sea_turtle-e78ad917bc4a.mp3",
+        "bytes": 125280,
+        "sha256": "e78ad917bc4abb9cce0dbaeb3074ea7a1658282ad780394648a555c2a301a5c4",
+        "mime": "audio/mpeg"
+      }
     },
     "普通章鱼": {
       "file": "common_octopus-c432450c03e0.pck.gz",
       "bytes": 658152,
       "rawBytes": 670140,
       "sha256": "c432450c03e0510e2b174d55bd1f9f91265240407c3694e4bf61a69d60f28fe7",
-      "id": "common_octopus"
+      "id": "common_octopus",
+      "narration": {
+        "file": "narration-common_octopus-49f948f95f1f.mp3",
+        "bytes": 123408,
+        "sha256": "49f948f95f1fdcdd631a1a727e45c63d33317b2cc3ea6fa2aef56e3b17e630e9",
+        "mime": "audio/mpeg"
+      }
     },
     "孟加拉虎": {
       "file": "bengal_tiger-07291bc462dd.pck.gz",
       "bytes": 958501,
       "rawBytes": 980288,
       "sha256": "07291bc462ddc85148c46910d6cf7f8f52397ee8f59d706bacad94633be4736d",
-      "id": "bengal_tiger"
+      "id": "bengal_tiger",
+      "narration": {
+        "file": "narration-bengal_tiger-988a8584f769.mp3",
+        "bytes": 131904,
+        "sha256": "988a8584f76909faf893340f2f503190ff72093c4fe346d5959b63a5b98e8cdc",
+        "mime": "audio/mpeg"
+      }
     },
     "东部大猩猩": {
       "file": "eastern_gorilla-fa7975c76e8b.pck.gz",
       "bytes": 871218,
       "rawBytes": 888380,
       "sha256": "fa7975c76e8b51560d8024f97af4d324ad354e15230dbaab8dfb9c8aea0adf6d",
-      "id": "eastern_gorilla"
+      "id": "eastern_gorilla",
+      "narration": {
+        "file": "narration-eastern_gorilla-7422ad68722e.mp3",
+        "bytes": 124128,
+        "sha256": "7422ad68722e050cbd5301c151355dcb705e736c1281308ff421e47c652b662d",
+        "mime": "audio/mpeg"
+      }
     },
     "褐喉三趾树懒": {
       "file": "brown_throated_sloth-71e1fa03e538.pck.gz",
       "bytes": 799576,
       "rawBytes": 814220,
       "sha256": "71e1fa03e53837c74dfd109dded312abbe8bbd0cfbfdab80048cf4cacff4ce41",
-      "id": "brown_throated_sloth"
+      "id": "brown_throated_sloth",
+      "narration": {
+        "file": "narration-brown_throated_sloth-441ca1e41b74.mp3",
+        "bytes": 135216,
+        "sha256": "441ca1e41b74424fe1cb1271e655006bfdd6ba47c6c52bb13f41a91b417d8e20",
+        "mime": "audio/mpeg"
+      }
     },
     "白头海雕": {
       "file": "bald_eagle-44d5be47ad2f.pck.gz",
       "bytes": 860154,
       "rawBytes": 873492,
       "sha256": "44d5be47ad2f5ee0f3eeae6ba05639981714da040318f895a88c30456e46f9e4",
-      "id": "bald_eagle"
+      "id": "bald_eagle",
+      "narration": {
+        "file": "narration-bald_eagle-aeb3e2207140.mp3",
+        "bytes": 139104,
+        "sha256": "aeb3e22071403f50ebede1ac96c3ea5cce597cc19b0b57e886eadfe76b5b0389",
+        "mime": "audio/mpeg"
+      }
     },
     "大红鹳（火烈鸟）": {
       "file": "greater_flamingo-6f751baa341f.pck.gz",
       "bytes": 604606,
       "rawBytes": 623876,
       "sha256": "6f751baa341fd88928a712e0dad072c6abc7033978a3441ae5ef7b9bcc639a89",
-      "id": "greater_flamingo"
+      "id": "greater_flamingo",
+      "narration": {
+        "file": "narration-greater_flamingo-a9a86b2a4d58.mp3",
+        "bytes": 129312,
+        "sha256": "a9a86b2a4d58593fed30cd753b08433c4a140e3f9210da3288c3f7c727b66341",
+        "mime": "audio/mpeg"
+      }
     },
     "红眼树蛙": {
       "file": "red_eyed_tree_frog-eac20d2d44f0.pck.gz",
       "bytes": 721215,
       "rawBytes": 735748,
       "sha256": "eac20d2d44f06798139760055f2f3e1e96fe44a67fe8c6e2f677e358faa78287",
-      "id": "red_eyed_tree_frog"
+      "id": "red_eyed_tree_frog",
+      "narration": {
+        "file": "narration-red_eyed_tree_frog-1d6eac3c5b44.mp3",
+        "bytes": 145008,
+        "sha256": "1d6eac3c5b44af9852892e0c4391c1b822d00101ed3d9f0ad4e0c816704eb0fe",
+        "mime": "audio/mpeg"
+      }
     }
   },
   "files": [
@@ -164,23 +288,24 @@
     "OFL-NotoSansSC.txt",
     "README.md",
     "african_elephant-c241f1a4ddd8.pck.gz",
+    "background-music-2b65a51ef1e0.mp3",
     "bald_eagle-44d5be47ad2f.pck.gz",
     "bengal_tiger-07291bc462dd.pck.gz",
     "bobo-download-ui.css",
     "bobo-download-ui.js",
     "bobo-gzip-worker.js",
+    "bobo-native-audio.js",
     "bobo-slim-loader.js",
     "bottlenose_dolphin-84e1c63ffc05.pck.gz",
     "brown_bear-46d080d68ac6.pck.gz",
     "brown_throated_sloth-71e1fa03e538.pck.gz",
     "common_octopus-c432450c03e0.pck.gz",
-    "core-daa93be7f62e.pck.gz",
-    "download-elephant-v1.webp",
+    "core-da6736c6dd40.pck.gz",
+    "download-elephant-v3.webp",
     "download-family-v1.webp",
     "eastern_gorilla-fa7975c76e8b.pck.gz",
     "emperor_penguin-5f65d49fdad0.pck.gz",
-    "engine-a1a6d45d7036.wasm.gz",
-    "engine-compat-e42688c58cc6.wasm.gz",
+    "engine-fbeeda862033.wasm.gz",
     "fflate-0.8.3.js",
     "giant_panda-3e15ed199bc5.pck.gz",
     "giraffe-3c7855bad01f.pck.gz",
@@ -196,6 +321,26 @@
     "index.js",
     "index.png",
     "lion-e94495e2abd7.pck.gz",
+    "narration-african_elephant-aa5e49505641.mp3",
+    "narration-bald_eagle-aeb3e2207140.mp3",
+    "narration-bengal_tiger-988a8584f769.mp3",
+    "narration-bottlenose_dolphin-f8c4b0f13048.mp3",
+    "narration-brown_bear-74b3fd5e20a7.mp3",
+    "narration-brown_throated_sloth-441ca1e41b74.mp3",
+    "narration-common_octopus-49f948f95f1f.mp3",
+    "narration-eastern_gorilla-7422ad68722e.mp3",
+    "narration-emperor_penguin-505dcefbcab9.mp3",
+    "narration-giant_panda-a586dd1eefc6.mp3",
+    "narration-giraffe-cc39fd9a18f0.mp3",
+    "narration-greater_flamingo-a9a86b2a4d58.mp3",
+    "narration-green_sea_turtle-e78ad917bc4a.mp3",
+    "narration-harp_seal-aa6240308a39.mp3",
+    "narration-lion-03353ed294f5.mp3",
+    "narration-plains_zebra-cb7dc9709eb4.mp3",
+    "narration-polar_bear-a8ed6a355081.mp3",
+    "narration-red_eyed_tree_frog-1d6eac3c5b44.mp3",
+    "narration-red_fox-1a91ab4534ee.mp3",
+    "narration-sika_deer-2874d6305a1d.mp3",
     "plains_zebra-c96e8ca24869.pck.gz",
     "polar_bear-a0a767acec7f.pck.gz",
     "red_eyed_tree_frog-eac20d2d44f0.pck.gz",
@@ -203,13 +348,20 @@
     "sika_deer-4ab0ec9bd006.pck.gz",
     "web-manifest.json"
   ],
+  "music": {
+    "file": "background-music-2b65a51ef1e0.mp3",
+    "bytes": 1498796,
+    "sha256": "2b65a51ef1e0ecacc1e1e43bf2e170c118306c1b38351cccf009257d5fcfe63b",
+    "mime": "audio/mpeg"
+  },
   "engineCompat": {
-    "file": "engine-compat-e42688c58cc6.wasm.gz",
-    "bytes": 9863637,
-    "rawBytes": 38439564,
-    "sha256": "e42688c58cc6675577ea6550a4a502da55ce2915c8aa2ed245db9ac21d2d2e4f",
+    "file": "engine-fbeeda862033.wasm.gz",
+    "bytes": 6828500,
+    "rawBytes": 27634060,
+    "sha256": "fbeeda862033eb7732aa9ddce929e6b6baabb31e99c35a9b5113a72287686f6c",
     "simd": false,
     "threads": false,
-    "godotVersion": "4.7.2"
+    "godotVersion": "4.7.2",
+    "profile": "bobo-2d"
   }
 }
